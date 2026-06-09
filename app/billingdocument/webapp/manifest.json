@@ -115,6 +115,15 @@
                 "@com.sap.vocabularies.UI.v1.LineItem": {
                   "tableSettings": {
                     "type": "ResponsiveTable"
+                  },
+                  "actions": {
+                    "Fetch": {
+                      "press": "billingdocument.ext.controller.Fetch.Fetch",
+                      "visible": true,
+                      "enabled": true,
+                      "requiresSelection": true,
+                      "text": "DownLoad"
+                    }
                   }
                 }
               }

@@ -18,7 +18,8 @@
     "@cap-js/cds-types": "^0.15.0"
   },
   "scripts": {
-    "start": "cds-serve"
+    "start": "cds-serve",
+    "watch-billingdocument": "cds watch --open billingdocument/index.html?sap-ui-xx-viewCache=false --livereload false"
   },
   "cds": {
     "requires": {
@@ -38,5 +39,8 @@
         }
       }
     }
-  }
+  },
+  "sapux": [
+    "app/billingdocument"
+  ]
 }

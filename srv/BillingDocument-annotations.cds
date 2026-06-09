@@ -1,7 +1,6 @@
 using { konnekt } from './service';
 
 annotate konnekt.BillingDocument with @(
-        Capabilities.SearchRestrictions : {false},
         Capabilities.DeleteRestrictions : {
             $Type : 'Capabilities.DeleteRestrictionsType',
             Deletable: false
@@ -36,20 +35,20 @@ annotate konnekt.BillingDocument with @(
             },
             {
                 $Type : 'UI.DataField',
-                Label : 'Billing Document Type',
-                ![@HTML5.CssDefaults]: {width:'10rem'},
+                Label : 'Billing Type',
+                ![@HTML5.CssDefaults]: {width:'8rem'},
                 Value : BillingDocumentType,
             },
             {
                 $Type : 'UI.DataField',
-                Label : 'Customer',
+                Label : 'Sold-to Party',
                 ![@HTML5.CssDefaults]: {width:'8rem'},
                 Value : SoldToParty,
             },
             {
                 $Type : 'UI.DataField',
-                Label : 'Status',
-                ![@HTML5.CssDefaults]: {width:'10rem'},
+                Label : 'Billing Document Status',
+                ![@HTML5.CssDefaults]: {width:'11rem'},
                 Value : OverallBillingStatus,
             },
             
@@ -67,9 +66,30 @@ annotate konnekt.BillingDocument with @(
             },
 
     ],
-    UI.SelectionFields: [ BillingDocumentIsCancelled, BillingDocument, BillingDocumentType, BillingDocumentDate ]
+    UI.SelectionFields: [ BillingDocument, BillingDocumentType, SoldToParty, OverallBillingStatus, BillingDocumentDate ]
 );
 
+annotate konnekt.BillingDocument with {
+    OverallBillingStatus @(
+        Common.Label: 'Billing Document Status',
+        Common.ValueListWithFixedValues: true,
+        Common.ValueList: {
+            $Type: 'Common.ValueListType',
+            CollectionPath: 'OverallBillingStatusVH',
+            Parameters: [
+                {
+                    $Type: 'Common.ValueListParameterInOut',
+                    LocalDataProperty: OverallBillingStatus,
+                    ValueListProperty: 'code'
+                },
+                {
+                    $Type: 'Common.ValueListParameterDisplayOnly',
+                    ValueListProperty: 'name'
+                }
+            ]
+        }
+    );
+};
 
 // annotate konnekt.BillingDocument with {
 //      @Common.ValueListWithFixedValues : true

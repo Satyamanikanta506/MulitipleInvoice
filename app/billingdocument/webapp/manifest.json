@@ -104,13 +104,7 @@
               "initialLoad": true,
               "contextPath": "/BillingDocument",
               "variantManagement": "Page",
-              "navigation": {
-                "BillingDocument": {
-                  "detail": {
-                    "route": "BillingDocumentObjectPage"
-                  }
-                }
-              },
+              "navigation": {},
               "controlConfiguration": {
                 "@com.sap.vocabularies.UI.v1.LineItem": {
                   "tableSettings": {

@@ -12,7 +12,8 @@
     "@sap-cloud-sdk/resilience": "^4.2.0",
     "@sap/cds": "^9.9.1",
     "@sap/cds-dk": "^9.9.2",
-    "express": "^4.22.2"
+    "express": "^4.22.2",
+    "pdf-lib": "^1.17.1"
   },
   "devDependencies": {
     "@cap-js/cds-types": "^0.15.0"

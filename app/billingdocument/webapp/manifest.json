@@ -112,9 +112,9 @@
                   },
                   "actions": {
                     "Fetch": {
-                      "press": "billingdocument.ext.controller.Fetch.Fetch",
+                      "press": "billingdocument.ext.controller.Fetch.PrintInvoice",
                       "visible": true,
-                      "enabled": true,
+                      "enabled": "billingdocument.ext.controller.Fetch.enabledForPrintEinvoice",
                       "requiresSelection": true,
                       "text": "DownLoad"
                     }

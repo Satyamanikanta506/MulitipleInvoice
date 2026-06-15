@@ -16,6 +16,8 @@ service konnekt {
         OverallBillingStatus
     }
 
+    action BillingArray(BillingDocument : String, filePath : String) returns {BillingDocument: String};
+
     @readonly
     @cds.persistence.skip
     entity OverallBillingStatusVH {

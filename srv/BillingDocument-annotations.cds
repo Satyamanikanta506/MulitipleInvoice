@@ -1,6 +1,7 @@
 using { konnekt } from './service';
 
 annotate konnekt.BillingDocument with @(
+        Capabilities.SearchRestrictions : {false},
         Capabilities.DeleteRestrictions : {
             $Type : 'Capabilities.DeleteRestrictionsType',
             Deletable: false

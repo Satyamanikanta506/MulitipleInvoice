@@ -1,4 +1,6 @@
 using { API_BILLING_DOCUMENT_SRV as S4_BD } from './external/API_BILLING_DOCUMENT_SRV';
+using { API_BUSINESS_PARTNER as S4_CUST } from './external/API_BUSINESS_PARTNER';
+
 
 service konnekt {
     entity BillingDocument as projection on S4_BD.A_BillingDocument{
@@ -13,10 +15,13 @@ service konnekt {
         @title : 'Net Value'
         TotalNetAmount,
         @title : 'Billing Document Status'
-        OverallBillingStatus
+        OverallBillingStatus,
+        @title : 'Plant'
+        YY1_Plant_BDH
     }
 
     action BillingArray(BillingDocument : String, filePath : String) returns {BillingDocument: String};
+
 
     @readonly
     @cds.persistence.skip
@@ -25,5 +30,12 @@ service konnekt {
         @Common.TextArrangement: #TextFirst
         key code : String(1);
         name : String;
+    }
+
+    entity BusinesPartner as projection on S4_CUST.A_BusinessPartner{
+        key BusinessPartner,
+        Customer,
+        BusinessPartnerFullName
+
     }
 }

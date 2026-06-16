@@ -639,6 +639,27 @@
      "@sap.label": "Inv. List Bill. Date",
      "@sap.quickinfo": "Billing date for the invoice list"
     },
+    "YY1_SEZNonSEZ1_BDH": {
+     "type": "cds.Boolean",
+     "@sap.filter.restriction": "single-value",
+     "@sap.label": "SEZ"
+    },
+    "YY1_ServicesType1_BDH": {
+     "type": "cds.String",
+     "length": 2,
+     "@sap.display.format": "UpperCase",
+     "@sap.label": "Services Type"
+    },
+    "YY1_CustomerPOC1_BDH": {
+     "type": "cds.String",
+     "length": 80,
+     "@sap.label": "Customer POC"
+    },
+    "YY1_Plant_BDH": {
+     "type": "cds.String",
+     "length": 4,
+     "@sap.label": "Plant"
+    },
     "to_Item": {
      "type": "cds.Association",
      "target": "API_BILLING_DOCUMENT_SRV.A_BillingDocumentItem",
@@ -1717,6 +1738,18 @@
      "@sap.label": "Contact Person",
      "@sap.quickinfo": "Number of Contact Person"
     },
+    "BusinessPartnerAddressUUID": {
+     "type": "cds.UUID",
+     "@sap.label": "GUID of a Business Partner Address",
+     "@sap.heading": ""
+    },
+    "BPRefAddrForDocSpcfcAddrUUID": {
+     "type": "cds.UUID",
+     "@sap.label": "GUID of a Business Partner Address",
+     "@sap.heading": "",
+     "@sap.creatable": "false",
+     "@sap.updatable": "false"
+    },
     "to_BillingDocument": {
      "type": "cds.Association",
      "target": "API_BILLING_DOCUMENT_SRV.A_BillingDocument",
@@ -2198,6 +2231,18 @@
      "@sap.display.format": "NonNegative",
      "@sap.label": "Contact Person",
      "@sap.quickinfo": "Number of Contact Person"
+    },
+    "BusinessPartnerAddressUUID": {
+     "type": "cds.UUID",
+     "@sap.label": "GUID of a Business Partner Address",
+     "@sap.heading": ""
+    },
+    "BPRefAddrForDocSpcfcAddrUUID": {
+     "type": "cds.UUID",
+     "@sap.label": "GUID of a Business Partner Address",
+     "@sap.heading": "",
+     "@sap.creatable": "false",
+     "@sap.updatable": "false"
     },
     "to_BillingDocument": {
      "type": "cds.Association",

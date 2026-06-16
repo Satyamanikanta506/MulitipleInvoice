@@ -3,12 +3,18 @@ const cds = require("@sap/cds");
 
 module.exports = cds.service.impl(async function () {
     const S4_BD = await cds.connect.to("API_BILLING_DOCUMENT_SRV");
+    const S4_CUST = await cds.connect.to("API_BUSINESS_PARTNER");
 
-    const { BillingDocument, OverallBillingStatusVH } = this.entities;
+    const { BillingDocument, OverallBillingStatusVH, BusinesPartner } = this.entities;
 
     this.on("READ", BillingDocument, async (req) => {
-        return await S4_BD.run(req.query);
+        return await S4_BD.run(req.query.where(`(BillingDocumentType = 'F2' or BillingDocumentType = 'F5' or BillingDocumentType = 'F8' or BillingDocumentType = 'G2' or BillingDocumentType = 'L2')`));
     });
+
+    this.on("READ",BusinesPartner, async (req) =>{
+        return await S4_CUST.run(req.query);
+    } );
+
 
     this.on("READ", OverallBillingStatusVH, async (req) => {
         const statuses = [

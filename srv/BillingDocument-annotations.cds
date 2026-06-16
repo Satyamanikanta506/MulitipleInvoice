@@ -43,7 +43,7 @@ annotate konnekt.BillingDocument with @(
             {
                 $Type : 'UI.DataField',
                 Label : 'Sold-to Party',
-                ![@HTML5.CssDefaults]: {width:'8rem'},
+                ![@HTML5.CssDefaults]: {width:'12rem'},
                 Value : SoldToParty,
             },
             {
@@ -101,6 +101,10 @@ annotate konnekt.BillingDocument with {
 annotate konnekt.BillingDocument with {
 
     OverallBillingStatus @Common.Text: BillingDocumentStatusText;
+    SoldToParty @(
+        Common.Text: SoldToPartyText,
+        Common.TextArrangement: #TextFirst
+    );
 
 };
 

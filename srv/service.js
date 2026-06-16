@@ -11,7 +11,7 @@ module.exports = cds.service.impl(async function () {
         return await S4_BD.run(req.query.where(`(BillingDocumentType = 'F2' or BillingDocumentType = 'F5' or BillingDocumentType = 'F8' or BillingDocumentType = 'G2' or BillingDocumentType = 'L2')`));
     });
     
-    this.after("READ", BillingDocument, (data) => {
+    this.after("READ", BillingDocument, async (data) => {
 
         const statusMap = {
             A: "Completed",
@@ -29,6 +29,46 @@ module.exports = cds.service.impl(async function () {
             item.BillingDocumentStatusText =
                 statusMap[item.OverallBillingStatus] || item.OverallBillingStatus;
         });
+
+        const soldToParties = [...new Set(data.map(item => item.SoldToParty).filter(Boolean))];
+        if (soldToParties.length > 0) {
+            try {
+                const queryParties = [];
+                soldToParties.forEach(p => {
+                    queryParties.push(p);
+                    if (/^\d+$/.test(p) && p.length < 10) {
+                        queryParties.push(p.padStart(10, '0'));
+                    }
+                });
+
+                const bpData = await S4_CUST.run(
+                    SELECT.from(BusinesPartner)
+                        .where({ Customer: { in: queryParties } })
+                );
+
+                const bpMap = {};
+                bpData.forEach(bp => {
+                    if (bp.Customer) {
+                        const unpaddedCustomer = bp.Customer.replace(/^0+/, '');
+                        bpMap[bp.Customer] = bp.BusinessPartnerFullName;
+                        bpMap[unpaddedCustomer] = bp.BusinessPartnerFullName;
+                    }
+                    if (bp.BusinessPartner) {
+                        const unpaddedBP = bp.BusinessPartner.replace(/^0+/, '');
+                        bpMap[bp.BusinessPartner] = bp.BusinessPartnerFullName;
+                        bpMap[unpaddedBP] = bp.BusinessPartnerFullName;
+                    }
+                });
+
+                data.forEach(item => {
+                    if (item.SoldToParty) {
+                        item.SoldToPartyText = bpMap[item.SoldToParty] || bpMap[item.SoldToParty.padStart(10, '0')] || '';
+                    }
+                });
+            } catch (err) {
+                console.error("Error fetching Business Partner details:", err);
+            }
+        }
 
     });
 

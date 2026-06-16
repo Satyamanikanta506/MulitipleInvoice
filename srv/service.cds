@@ -12,14 +12,12 @@ service konnekt {
         BillingDocumentDate,
         @title : 'Sold-to Party'
         SoldToParty,
+        virtual null as SoldToPartyText : String,
         @title : 'Net Value'
         TotalNetAmount,
         @title : 'Billing Document Status'
         OverallBillingStatus,
-        
-// ✅ NEW FIELD (important)
         virtual null as BillingDocumentStatusText : String,
-
         @title : 'Plant'
         YY1_Plant_BDH
     }

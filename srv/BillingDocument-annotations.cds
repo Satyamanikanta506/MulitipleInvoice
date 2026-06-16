@@ -92,6 +92,12 @@ annotate konnekt.BillingDocument with {
     );
 };
 
+annotate konnekt.BillingDocument with {
+
+    OverallBillingStatus @Common.Text: BillingDocumentStatusText;
+
+};
+
 // annotate konnekt.BillingDocument with {
 //      @Common.ValueListWithFixedValues : true
 //      @Common.ValueList : {

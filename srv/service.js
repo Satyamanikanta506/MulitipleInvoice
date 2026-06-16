@@ -10,6 +10,27 @@ module.exports = cds.service.impl(async function () {
     this.on("READ", BillingDocument, async (req) => {
         return await S4_BD.run(req.query.where(`(BillingDocumentType = 'F2' or BillingDocumentType = 'F5' or BillingDocumentType = 'F8' or BillingDocumentType = 'G2' or BillingDocumentType = 'L2')`));
     });
+    
+    this.after("READ", BillingDocument, (data) => {
+
+        const statusMap = {
+            A: "Completed",
+            B: "Incomplete",
+            C: "Canceled",
+            D: "Not Relevant",
+            E: "To Be Posted"
+        };
+
+        if (!Array.isArray(data)) {
+            data = [data];
+        }
+
+        data.forEach(item => {
+            item.BillingDocumentStatusText =
+                statusMap[item.OverallBillingStatus] || item.OverallBillingStatus;
+        });
+
+    });
 
     this.on("READ",BusinesPartner, async (req) =>{
         return await S4_CUST.run(req.query);
@@ -26,6 +47,7 @@ module.exports = cds.service.impl(async function () {
         ];
         return statuses;
     });
+
 
     this.on('BillingArray', async req => {
         try {

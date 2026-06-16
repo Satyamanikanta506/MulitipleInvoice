@@ -67,7 +67,13 @@ annotate konnekt.BillingDocument with @(
             },
 
     ],
-    UI.SelectionFields: [ BillingDocument, BillingDocumentType, SoldToParty, OverallBillingStatus, BillingDocumentDate, YY1_Plant_BDH ]
+    UI.SelectionFields: [ BillingDocument, BillingDocumentType, SoldToParty, OverallBillingStatus, BillingDocumentDate, YY1_Plant_BDH ],
+    UI.HeaderInfo : {
+        TypeName: 'Billing Document',
+        TypeNamePlural: 'Billing Documents',
+        Title: { Value: BillingDocument },
+        UpdateHidden: true,
+    }  
 );
 
 annotate konnekt.BillingDocument with {

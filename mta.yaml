@@ -15,9 +15,7 @@ modules:
     type: nodejs
     path: gen/srv
     parameters:
-      buildpacks:
-        - https://github.com/cloudfoundry/apt-buildpack.git
-        - nodejs_buildpack
+      buildpack: nodejs_buildpack
       stack: cflinuxfs4
       disk-quota: 1024M
       memory: 256M
@@ -29,6 +27,7 @@ modules:
           srv-url: ${default-url}
     requires:
       - name: MultipleInvoice-destination
+      - name: MultipleInvoice-auth
     
   - name: MultipleInvoice
     type: approuter.nodejs
@@ -48,6 +47,7 @@ modules:
           timeout: 9600000
           forwardAuthToken: true
       - name: MultipleInvoice-destination
+      - name: MultipleInvoice-auth
 
 resources:
   - name: MultipleInvoice-destination
@@ -55,3 +55,10 @@ resources:
     parameters:
       service: destination
       service-plan: lite
+  
+  - name: MultipleInvoice-auth
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: xsuaa
+      service-plan: application
+      path: ./xs-security.json

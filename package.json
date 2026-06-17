@@ -6,7 +6,6 @@
   "license": "UNLICENSED",
   "private": true,
   "dependencies": {
-    "@cap-js/sqlite": "^2.4.0",
     "@sap-cloud-sdk/connectivity": "^4",
     "@sap-cloud-sdk/http-client": "^4.2.0",
     "@sap-cloud-sdk/resilience": "^4.2.0",
@@ -52,7 +51,6 @@
           }
         }
       }
-
     }
   },
   "sapux": [

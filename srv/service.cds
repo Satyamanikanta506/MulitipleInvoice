@@ -3,6 +3,7 @@ using { API_BUSINESS_PARTNER as S4_CUST } from './external/API_BUSINESS_PARTNER'
 
 
 service konnekt {
+    @cds.persistence.skip
     entity BillingDocument as projection on S4_BD.A_BillingDocument{
         @title : 'Billing Document'
         key BillingDocument,
@@ -34,6 +35,7 @@ service konnekt {
         name : String;
     }
 
+    @cds.persistence.skip
     entity BusinesPartner as projection on S4_CUST.A_BusinessPartner{
         key BusinessPartner,
         Customer,

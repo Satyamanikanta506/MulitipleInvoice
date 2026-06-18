@@ -1,5 +1,6 @@
 using { API_BILLING_DOCUMENT_SRV as S4_BD } from './external/API_BILLING_DOCUMENT_SRV';
 using { API_BUSINESS_PARTNER as S4_CUST } from './external/API_BUSINESS_PARTNER';
+using { YY1_EINVOICESTATUS_CDS as S4_IRN } from './external/YY1_EINVOICESTATUS_CDS';
 
 
 service konnekt {
@@ -29,6 +30,7 @@ service konnekt {
     };
 
 
+
     @readonly
     @cds.persistence.skip
     entity OverallBillingStatusVH {
@@ -45,4 +47,9 @@ service konnekt {
         BusinessPartnerFullName
 
     }
+    @cds.persistence.skip
+    entity irnno as projection on S4_IRN.YY1_EInvoiceStatus{
+        key ElectronicDocUUID,
+        IN_ElectronicDocInvcRefNmbr
+    };
 }

@@ -1,0 +1,73 @@
+{
+ "meta": {
+  "creator": "cds-dk 9.9.2"
+ },
+ "$version": "2.0",
+ "definitions": {
+  "YY1_EINVOICESTATUS_CDS": {
+   "kind": "service",
+   "@cds.external": true,
+   "@m.IsDefaultEntityContainer": "true",
+   "@sap.message.scope.supported": "true",
+   "@sap.supported.formats": "atom json xlsx"
+  },
+  "YY1_EINVOICESTATUS_CDS.YY1_EInvoiceStatus": {
+   "kind": "entity",
+   "@cds.external": true,
+   "@cds.persistence.skip": true,
+   "@sap.creatable": "false",
+   "@sap.updatable": "false",
+   "@sap.deletable": "false",
+   "@sap.content.version": "1",
+   "@sap.label": "E Invoice Status",
+   "elements": {
+    "ElectronicDocUUID": {
+     "key": true,
+     "type": "cds.UUID",
+     "@sap.display.format": "UpperCase",
+     "@sap.required.in.filter": "false",
+     "@sap.label": "eDocument GUID",
+     "@sap.quickinfo": "eDocument: GUID",
+     "notNull": true
+    },
+    "IN_EDocEInvcExtNmbr": {
+     "type": "cds.String",
+     "length": 16,
+     "@sap.display.format": "UpperCase",
+     "@sap.required.in.filter": "false",
+     "@sap.label": "Document Nmbr",
+     "@sap.quickinfo": "eDocument India eInvoice: Invoice Number (ODN)"
+    },
+    "IN_ElectronicDocInvcRefNmbr": {
+     "type": "cds.String",
+     "length": 64,
+     "@sap.display.format": "UpperCase",
+     "@sap.required.in.filter": "false",
+     "@sap.label": "Invc Reference Nmbr",
+     "@sap.quickinfo": "eDocument India eInvoice: Invoice Registration Number(IRN)"
+    },
+    "BillingDocument": {
+     "type": "cds.String",
+     "length": 10,
+     "@sap.display.format": "UpperCase",
+     "@sap.required.in.filter": "false",
+     "@sap.label": "Billing Document"
+    },
+    "FiscalYear": {
+     "type": "cds.String",
+     "length": 4,
+     "@sap.display.format": "NonNegative",
+     "@sap.required.in.filter": "false",
+     "@sap.label": "Fiscal Year"
+    },
+    "SoldToParty": {
+     "type": "cds.String",
+     "length": 10,
+     "@sap.display.format": "UpperCase",
+     "@sap.required.in.filter": "false",
+     "@sap.label": "Sold-to Party"
+    }
+   }
+  }
+ }
+}

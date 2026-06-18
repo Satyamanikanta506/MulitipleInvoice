@@ -50,6 +50,17 @@
             "requestTimeout": 300000
           }
         }
+      },
+      "YY1_EINVOICESTATUS_CDS": {
+        "kind": "odata-v2",
+        "model": "srv/external/YY1_EINVOICESTATUS_CDS",
+        "[production]": {
+          "credentials": {
+            "destination": "S4HANA_DEV_BTP_COM_0120",
+            "path": "/sap/opu/odata/sap/YY1_EINVOICESTATUS_CDS",
+            "requestTimeout": 300000
+          }
+        }
       }
     }
   },

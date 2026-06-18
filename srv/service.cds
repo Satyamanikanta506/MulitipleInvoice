@@ -23,7 +23,10 @@ service konnekt {
         YY1_Plant_BDH
     }
 
-    action BillingArray(BillingDocument : String, filePath : String) returns {BillingDocument: String};
+    action BillingArray(BillingDocument : String) returns {
+        zipContent : String;
+        errorMessages : String;
+    };
 
 
     @readonly

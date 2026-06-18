@@ -7,8 +7,9 @@ sap.ui.define([
     "sap/m/TextArea",
     "sap/m/Button",
     "sap/m/VBox",
-    "sap/ui/core/BusyIndicator"
-], function (MessageToast, MessageBox, Dialog, Text, Input, TextArea, Button, VBox, BusyIndicator) {
+    "sap/ui/core/BusyIndicator",
+    "sap/ui/core/util/File"
+], function (MessageToast, MessageBox, Dialog, Text, Input, TextArea, Button, VBox, BusyIndicator, SapFile) {
     'use strict';
 
     return {
@@ -29,80 +30,69 @@ sap.ui.define([
             var sBillingDocuments = aBillingDocuments.join(",");
 
             var that = this;
-            var fnInvokeBillingAction = async function (sFilePath) {
-                var mParameters = {
-                    model: aSelectedContexts[0].getModel(),
-                    parameterValues: [
-                        { name: 'BillingDocument', value: sBillingDocuments },
-                        { name: 'filePath', value: sFilePath }
-                    ],
-                    skipParameterDialog: true
-                };
-
-                BusyIndicator.show();
-                try {
-                    var result = await that.editFlow.invokeAction('BillingArray', mParameters);
-                    var oData = result.getObject();
-                    var sMessage = "";
-                    if (oData) {
-                        if (oData.value && oData.value.BillingDocument) {
-                            sMessage = oData.value.BillingDocument;
-                        } else if (oData.BillingDocument) {
-                            sMessage = oData.BillingDocument;
-                        } else if (oData.value) {
-                            sMessage = oData.value;
-                        }
-                    }
-
-                    BusyIndicator.hide();
-                    MessageBox.success(sMessage || "Files successfully downloaded.");
-                } catch (e) {
-                    MessageBox.error("An error occurred while downloading PDFs: " + e.message);
-                    BusyIndicator.hide();
-                }
+            var mParameters = {
+                model: aSelectedContexts[0].getModel(),
+                parameterValues: [
+                    { name: 'BillingDocument', value: sBillingDocuments }
+                ],
+                skipParameterDialog: true
             };
 
-            var oInput = new Input({
-                width: "100%",
-                placeholder: "e.g., /Users/username/Downloads"
-            });
-
-            var oDialog = new Dialog({
-                title: "Download PDF Invoices",
-                type: "Message",
-                content: new VBox({
-                    items: [
-                        new Text({ text: "Enter the local system folder path where the PDF files will be stored:" }),
-                        oInput
-                    ]
-                }),
-                beginButton: new Button({
-                    text: "Download",
-                    type: "Emphasized",
-                    press: async function () {
-                        var sFilePath = oInput.getValue().trim();
-                        if (!sFilePath) {
-                            oInput.setValueState("Error");
-                            oInput.setValueStateText("Folder path is required to save the documents.");
-                            return;
-                        }
-                        oInput.setValueState("None");
-                        oDialog.close();
-                        await fnInvokeBillingAction(sFilePath);
-                    }
-                }),
-                endButton: new Button({
-                    text: "Cancel",
-                    press: function () {
-                        oDialog.close();
-                    }
-                }),
-                afterClose: function () {
-                    oDialog.destroy();
+            BusyIndicator.show();
+            try {
+                var result = await that.editFlow.invokeAction('BillingArray', mParameters);
+                var oData = result.getObject();
+                
+                var sZipContent = "";
+                var sErrorMessages = "";
+                
+                if (oData && oData.value) {
+                    sZipContent = oData.value.zipContent;
+                    sErrorMessages = oData.value.errorMessages;
+                } else if (oData) {
+                    sZipContent = oData.zipContent;
+                    sErrorMessages = oData.errorMessages;
                 }
-            });
 
-            oDialog.open();
+                if (!sZipContent) {
+                    throw new Error("No ZIP content received from server.");
+                }
+
+                // Decode base64 to Blob
+                var base64ToBlob = function (base64, mimeType) {
+                    var byteCharacters = atob(base64);
+                    var byteNumbers = new Array(byteCharacters.length);
+                    for (var i = 0; i < byteCharacters.length; i++) {
+                        byteNumbers[i] = byteCharacters.charCodeAt(i);
+                    }
+                    var byteArray = new Uint8Array(byteNumbers);
+                    return new Blob([byteArray], { type: mimeType });
+                };
+
+                var oBlob = base64ToBlob(sZipContent, "application/zip");
+                
+                // Determine filename
+                var sFileName = "Invoices";
+                if (aBillingDocuments.length === 1) {
+                    sFileName = "Invoice_" + aBillingDocuments[0];
+                } else {
+                    sFileName = "Invoices_" + new Date().toISOString().slice(0, 10);
+                }
+
+                // Save ZIP file in browser
+                SapFile.save(oBlob, sFileName, "zip", "application/zip");
+
+                BusyIndicator.hide();
+
+                if (sErrorMessages) {
+                    MessageBox.warning("ZIP downloaded successfully, but some documents failed:\n\n" + sErrorMessages);
+                } else {
+                    MessageToast.show("Invoices successfully downloaded as ZIP.");
+                }
+            } catch (e) {
+                MessageBox.error("An error occurred while downloading PDFs: " + e.message);
+                BusyIndicator.hide();
+            }
         },
 
         enabledForPrintEinvoice: function (oBindingContext, aSelectedContexts) {

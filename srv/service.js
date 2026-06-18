@@ -92,12 +92,8 @@ module.exports = cds.service.impl(async function () {
     this.on('BillingArray', async req => {
         try {
             const sBillingDocuments = req.data.BillingDocument;
-            const filePath = req.data.filePath;
             if (!sBillingDocuments) {
                 throw new Error('Missing required BillingDocument list');
-            }
-            if (!filePath) {
-                throw new Error('Local folder path (filePath) is required');
             }
 
             const aDocIds = sBillingDocuments.split(',').map(id => id.trim()).filter(Boolean);
@@ -106,13 +102,12 @@ module.exports = cds.service.impl(async function () {
             }
 
             const billingDocService = await cds.connect.to('API_BILLING_DOCUMENT_SRV');
-            const fs = require('fs');
-            const path = require('path');
-            const resolvedPath = path.resolve(filePath.trim());
-            fs.mkdirSync(resolvedPath, { recursive: true });
+            const archiver = require('archiver');
+            const { PassThrough } = require('stream');
 
             const successDocs = [];
             const failedDocs = [];
+            const zipFiles = [];
 
             for (const BillDocId of aDocIds) {
                 try {
@@ -124,39 +119,60 @@ module.exports = cds.service.impl(async function () {
                     if (printPdf?.GetPDF?.BillingDocumentBinary) {
                         const cleanPdfBinary = printPdf.GetPDF.BillingDocumentBinary.replace(/(\r\n|\n|\r)/gm, "");
                         const fileBytes = Buffer.from(cleanPdfBinary, 'base64');
-                        const fileDest = path.join(resolvedPath, `${BillDocId}.pdf`);
-                        fs.writeFileSync(fileDest, fileBytes);
-                        
-                        console.log(`Successfully saved PDF locally at: ${fileDest}`);
+                        zipFiles.push({
+                            name: `${BillDocId}.pdf`,
+                            content: fileBytes
+                        });
                         successDocs.push(BillDocId);
                     } else {
                         console.warn(`Failed to retrieve PDF document for ID: ${BillDocId}`);
                         failedDocs.push(`${BillDocId} (Empty Binary)`);
                     }
                 } catch (err) {
-                    console.error(`Error fetching/saving PDF for ID ${BillDocId}:`, err);
+                    console.error(`Error fetching PDF for ID ${BillDocId}:`, err);
                     failedDocs.push(`${BillDocId} (${err.message || 'Request failed'})`);
                 }
             }
 
-            // Construct response summary message
-            let responseMsg = "";
-            if (successDocs.length > 0) {
-                responseMsg += `Successfully saved to ${filePath}:\n` + successDocs.map(id => `- ${id}.pdf`).join('\n') + `\n\n`;
-            } else {
-                responseMsg += `No documents were successfully saved.\n\n`;
+            if (zipFiles.length === 0) {
+                throw new Error('No PDF documents could be retrieved. Errors:\n' + failedDocs.join('\n'));
             }
 
+            // Create ZIP in memory using archiver
+            const zipBuffer = await new Promise((resolve, reject) => {
+                const archive = archiver('zip', { zlib: { level: 9 } });
+                const buffers = [];
+                const stream = new PassThrough();
+                
+                stream.on('data', data => buffers.push(data));
+                stream.on('end', () => resolve(Buffer.concat(buffers)));
+                stream.on('error', err => reject(err));
+                
+                archive.pipe(stream);
+                
+                for (const file of zipFiles) {
+                    archive.append(file.content, { name: file.name });
+                }
+                
+                archive.finalize();
+            });
+
+            const zipBase64 = zipBuffer.toString('base64');
+
+            let errorMessages = "";
             if (failedDocs.length > 0) {
-                responseMsg += `Not saved / Failed:\n` + failedDocs.map(entry => `- ${entry}`).join('\n');
+                errorMessages = failedDocs.map(entry => `- ${entry}`).join('\n');
             }
 
-            return { BillingDocument: responseMsg };
+            return {
+                zipContent: zipBase64,
+                errorMessages: errorMessages
+            };
         } catch (error) {
             console.error('Error in BillingArray handler:', error);
             throw new cds.error({
                 code: 'BILLING_ARRAY_ERROR',
-                message: error.message || 'Failed to process and save PDF documents',
+                message: error.message || 'Failed to process and zip PDF documents',
                 status: 500
             });
         }

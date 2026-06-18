@@ -11,7 +11,7 @@ service konnekt {
         BillingDocumentType,
         @title : 'Billing Date'
         BillingDocumentDate,
-        @title : 'Sold-to Party'
+        @title : 'Payer'
         SoldToParty,
         virtual null as SoldToPartyText : String,
         @title : 'Net Value'

@@ -42,7 +42,7 @@ annotate konnekt.BillingDocument with @(
             },
             {
                 $Type : 'UI.DataField',
-                Label : 'Sold-to Party',
+                Label : 'Payer',
                 ![@HTML5.CssDefaults]: {width:'12rem'},
                 Value : SoldToParty,
             },

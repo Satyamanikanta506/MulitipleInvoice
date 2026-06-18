@@ -66,6 +66,14 @@ annotate konnekt.BillingDocument with @(
                 Value : TotalNetAmount,
             },
 
+              {
+                $Type : 'UI.DataField',
+                Label : 'E Invoice Document',
+                ![@HTML5.CssDefaults]: {width:'15rem'},
+                Value : IN_ElectronicDocInvcRefNmbr,
+                Criticality : EInvoiceCriticality
+            },
+
     ],
     UI.SelectionFields: [ BillingDocument, BillingDocumentType, SoldToParty, OverallBillingStatus, BillingDocumentDate, YY1_Plant_BDH ],
     UI.HeaderInfo : {
@@ -107,6 +115,7 @@ annotate konnekt.BillingDocument with {
     );
 
 };
+
 
 // annotate konnekt.BillingDocument with {
 //      @Common.ValueListWithFixedValues : true

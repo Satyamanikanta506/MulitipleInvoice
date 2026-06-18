@@ -71,11 +71,50 @@ module.exports = cds.service.impl(async function () {
             }
         }
 
+       
+        // IRN Data
+        try {
+        
+            const irnData = await S4_irnno.run(
+                SELECT.from(irnno)
+            );
+        
+            const irnMap = {};
+        
+            irnData.forEach(irn => {
+                irnMap[irn.BillingDocument] =
+                    irn.IN_ElectronicDocInvcRefNmbr;
+            });
+        
+            data.forEach(item => {
+            
+                const irnValue =
+                    irnMap[item.BillingDocument] || "";
+
+            item.IN_ElectronicDocInvcRefNmbr =
+            irnValue ? "Submitted" : "Not Submitted";
+
+
+            
+            item.EInvoiceCriticality =
+                irnValue ? 3 : 2;   // 3=Green, 2=Orange
+
+        });
+        } catch (err) {
+
+            data.forEach(item => {
+              item.IN_ElectronicDocInvcRefNmbr = "Not Submitted";
+              item.EInvoiceCriticality = 2;
+        });
+
+    }
+
+
     });
 
-    this.on("READ",BusinesPartner, async (req) =>{
-        return await S4_CUST.run(req.query);
-    } );
+
+
+
 
 
     this.on("READ", OverallBillingStatusVH, async (req) => {
@@ -89,10 +128,13 @@ module.exports = cds.service.impl(async function () {
         return statuses;
     });
 
-    this.on("READ", irnno, async (req) =>{
-        return await S4_irnno.run(req.query);
-    } )
+    // this.on("READ", irnno, async (req) =>{
+    //     return await S4_irnno.run(req.query);
+    // } )
+   
 
+
+    // -------------
 
     this.on('BillingArray', async req => {
         try {

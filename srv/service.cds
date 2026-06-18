@@ -21,7 +21,10 @@ service konnekt {
         OverallBillingStatus,
         virtual null as BillingDocumentStatusText : String,
         @title : 'Plant'
-        YY1_Plant_BDH
+        YY1_Plant_BDH,
+        @title : 'E Invoice Document'
+        virtual null as IN_ElectronicDocInvcRefNmbr : String(20),
+        virtual null as EInvoiceCriticality : Integer
     }
 
     action BillingArray(BillingDocument : String) returns {
@@ -50,6 +53,15 @@ service konnekt {
     @cds.persistence.skip
     entity irnno as projection on S4_IRN.YY1_EInvoiceStatus{
         key ElectronicDocUUID,
+        BillingDocument,
         IN_ElectronicDocInvcRefNmbr
     };
+
+//     entity irnno as projection on S4_IRN.YY1_EInvoiceStatus {
+//     key BillingDocument,
+//     ElectronicDocUUID,
+
+//     irn : Association to irnno
+//         on irn.ElectronicDocUUID = ElectronicDocUUID
+// }
 }

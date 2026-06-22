@@ -116,7 +116,7 @@
                       "visible": true,
                       "enabled": "billingdocument.ext.controller.Fetch.enabledForPrintEinvoice",
                       "requiresSelection": true,
-                      "text": "DownLoad"
+                      "text": "Dowload"
                     }
                   }
                 }

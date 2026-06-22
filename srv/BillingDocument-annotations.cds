@@ -63,7 +63,7 @@ annotate konnekt.BillingDocument with @(
             {
                 $Type : 'UI.DataField',
                 Label : 'Billing Date',
-                ![@HTML5.CssDefaults]: {width:'10rem'},
+                ![@HTML5.CssDefaults]: {width:'7rem'},
                 Value : BillingDocumentDate,
             },
             {
@@ -74,8 +74,8 @@ annotate konnekt.BillingDocument with @(
             },
             {
                 $Type : 'UI.DataField',
-                Label : '',
-                ![@HTML5.CssDefaults]: {width:'10rem'},
+                Label : 'Plant',
+                ![@HTML5.CssDefaults]: {width:'5rem'},
                 Value : YY1_Plant_BDH,
             }
 

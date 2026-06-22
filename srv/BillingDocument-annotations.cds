@@ -30,6 +30,13 @@ annotate konnekt.BillingDocument with @(
         UI.LineItem: [
             {
                 $Type : 'UI.DataField',
+                Label : 'E-Invoice Status',
+                ![@HTML5.CssDefaults]: {width:'9rem'},
+                Value : IN_ElectronicDocInvcRefNmbr,
+                Criticality : EInvoiceCriticality
+            },
+            {
+                $Type : 'UI.DataField',
                 Label : 'Billing Document',
                 ![@HTML5.CssDefaults]: {width:'10rem'},
                 Value : BillingDocument,
@@ -59,20 +66,18 @@ annotate konnekt.BillingDocument with @(
                 ![@HTML5.CssDefaults]: {width:'10rem'},
                 Value : BillingDocumentDate,
             },
-             {
+            {
                 $Type : 'UI.DataField',
                 Label : 'Net Value',
                 ![@HTML5.CssDefaults]: {width:'10rem'},
                 Value : TotalNetAmount,
             },
-
-              {
+            {
                 $Type : 'UI.DataField',
-                Label : 'E Invoice Document',
-                ![@HTML5.CssDefaults]: {width:'15rem'},
-                Value : IN_ElectronicDocInvcRefNmbr,
-                Criticality : EInvoiceCriticality
-            },
+                Label : '',
+                ![@HTML5.CssDefaults]: {width:'10rem'},
+                Value : YY1_Plant_BDH,
+            }
 
     ],
     UI.SelectionFields: [ BillingDocument, BillingDocumentType, SoldToParty, OverallBillingStatus, BillingDocumentDate, YY1_Plant_BDH ],

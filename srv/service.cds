@@ -22,7 +22,7 @@ service konnekt {
         virtual null as BillingDocumentStatusText : String,
         @title : 'Plant'
         YY1_Plant_BDH,
-        @title : 'E Invoice Document'
+        @title : 'E Invoice Status'
         virtual null as IN_ElectronicDocInvcRefNmbr : String(20),
         virtual null as EInvoiceCriticality : Integer
     }

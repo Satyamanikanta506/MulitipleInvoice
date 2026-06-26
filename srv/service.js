@@ -207,7 +207,7 @@ module.exports = cds.service.impl(async function () {
 
             for (const BillDocId of aDocIds) {
                 try {
-                    const printPdf = await billingDocService.tx().send({
+                    const printPdf = await S4_BD.tx().send({
                         method: 'GET',
                         path: `GetPDF?BillingDocument='${BillDocId}'`
                     });

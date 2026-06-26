@@ -112,7 +112,7 @@
                   },
                   "actions": {
                     "Fetch": {
-                      "press": "einvoice.billingdocumenteinvoice.ext.controller.Fetch.Fetch",
+                      "press": "einvoice.billingdocumenteinvoice.ext.controller.Fetch.PrintInvoice",
                       "visible": true,
                       "enabled":"einvoice.billingdocumenteinvoice.ext.controller.Fetch.enabledForPrintEinvoice",
                       "requiresSelection": true,

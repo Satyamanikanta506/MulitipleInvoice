@@ -273,4 +273,98 @@ module.exports = cds.service.impl(async function () {
             });
         }
     });
+
+
+
+    ///-----------------
+
+
+     this.on('BillingArrayy', async req => {
+        try {
+            const sBillingDocuments = req.data.BillingDocument;
+            if (!sBillingDocuments) {
+                throw new Error('Missing required BillingDocument list');
+            }
+
+            const aDocIds = sBillingDocuments.split(',').map(id => id.trim()).filter(Boolean);
+            if (aDocIds.length === 0) {
+                throw new Error('No valid BillingDocument IDs provided');
+            }
+
+            const billingDocService = await cds.connect.to('YY1_BILLINGDOCUMENTAPI_CDS');
+            const archiver = require('archiver');
+            const { PassThrough } = require('stream');
+
+            const successDocs = [];
+            const failedDocs = [];
+            const zipFiles = [];
+
+            for (const BillDocId of aDocIds) {
+                try {
+                    const printPdf = await billingDocService.tx().send({
+                        method: 'GET',
+                        path: `GetPDF?BillingDocument='${BillDocId}'`
+                    });
+
+                    if (printPdf?.GetPDF?.BillingDocumentBinary) {
+                        const cleanPdfBinary = printPdf.GetPDF.BillingDocumentBinary.replace(/(\r\n|\n|\r)/gm, "");
+                        const fileBytes = Buffer.from(cleanPdfBinary, 'base64');
+                        zipFiles.push({
+                            name: `${BillDocId}.pdf`,
+                            content: fileBytes
+                        });
+                        successDocs.push(BillDocId);
+                    } else {
+                        console.warn(`Failed to retrieve PDF document for ID: ${BillDocId}`);
+                        failedDocs.push(`${BillDocId} (Empty Binary)`);
+                    }
+                } catch (err) {
+                    console.error(`Error fetching PDF for ID ${BillDocId}:`, err);
+                    failedDocs.push(`${BillDocId} (${err.message || 'Request failed'})`);
+                }
+            }
+
+            if (zipFiles.length === 0) {
+                throw new Error('No PDF documents could be retrieved. Errors:\n' + failedDocs.join('\n'));
+            }
+
+            // Create ZIP in memory using archiver
+            const zipBuffer = await new Promise((resolve, reject) => {
+                const archive = archiver('zip', { zlib: { level: 9 } });
+                const buffers = [];
+                const stream = new PassThrough();
+                
+                stream.on('data', data => buffers.push(data));
+                stream.on('end', () => resolve(Buffer.concat(buffers)));
+                stream.on('error', err => reject(err));
+                
+                archive.pipe(stream);
+                
+                for (const file of zipFiles) {
+                    archive.append(file.content, { name: file.name });
+                }
+                
+                archive.finalize();
+            });
+
+            const zipBase64 = zipBuffer.toString('base64');
+
+            let errorMessages = "";
+            if (failedDocs.length > 0) {
+                errorMessages = failedDocs.map(entry => `- ${entry}`).join('\n');
+            }
+
+            return {
+                zipContent: zipBase64,
+                errorMessages: errorMessages
+            };
+        } catch (error) {
+            console.error('Error in BillingArrayy handler:', error);
+            throw new cds.error({
+                code: 'BILLING_ARRAY_ERROR',
+                message: error.message || 'Failed to process and zip PDF documents',
+                status: 500
+            });
+        }
+    });
 });

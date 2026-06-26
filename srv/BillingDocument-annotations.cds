@@ -146,15 +146,15 @@ annotate konnekt.Billinginv with @(
             $Type : 'Capabilities.DeleteRestrictionsType',
             Deletable: false
         },
-        // Capabilities : {
-        //     FilterRestrictions : {
-        //         FilterExpressionRestrictions :
-        //         [{
-        //             Property : 'BillingDocumentDate',
-        //             AllowedExpressions : 'SingleRange'
-        //         }]
-        //     }
-        // },
+        Capabilities : {
+            FilterRestrictions : {
+                FilterExpressionRestrictions :
+                [{
+                    Property : 'BillingDocumentDate',
+                    AllowedExpressions : 'SingleRange'
+                }]
+            }
+        },
         UI.PresentationVariant :{
         SortOrder : [
         {

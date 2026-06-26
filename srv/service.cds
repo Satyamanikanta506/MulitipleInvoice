@@ -84,6 +84,10 @@ service konnekt {
         E_InvoiceStatus,
         
     }
+   action BillingArrayy(BillingDocument : String) returns {
+        zipContent : String;
+        errorMessages : String;
+    };
 
     entity BillingStatusVH {
     key code : String(1);

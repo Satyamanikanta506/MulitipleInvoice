@@ -1,7 +1,7 @@
 using { API_BILLING_DOCUMENT_SRV as S4_BD } from './external/API_BILLING_DOCUMENT_SRV';
 using { API_BUSINESS_PARTNER as S4_CUST } from './external/API_BUSINESS_PARTNER';
 using { YY1_EINVOICESTATUS_CDS as S4_IRN } from './external/YY1_EINVOICESTATUS_CDS';
-
+using { YY1_BILLINGDOCUMENTAPI_CDS as S4_Einvoice } from './external/YY1_BILLINGDOCUMENTAPI_CDS';
 
 service konnekt {
     @cds.persistence.skip
@@ -64,4 +64,37 @@ service konnekt {
 //     irn : Association to irnno
 //         on irn.ElectronicDocUUID = ElectronicDocUUID
 // }
+    entity Billinginv as projection on S4_Einvoice.YY1_BillingDocumentAPI{
+        @title : 'Billing Document'
+        key BillingDocument,
+        @title : 'Billing Type'
+        BillingDocumentType,
+        @title : 'Billing Date'
+        BillingDocumentDate,
+        Payer,
+        @title : 'Net Value'
+        TotalNetAmount,
+        @title : 'Billing Document Status'
+        OverallBillingStatus,
+
+        virtual null as BillingStatusDesc : String(50),
+        @title : 'Plant'
+        YY1_Plant_BDH,
+        @title : 'E Invoice Status'
+        E_InvoiceStatus,
+        
+    }
+
+    entity BillingStatusVH {
+    key code : String(1);
+        name : String(50);
+    }
+
+    entity EInvoiceStatusVH {
+    key code : String(20);
+    name     : String(50);
+    }
+
+
+    
 }

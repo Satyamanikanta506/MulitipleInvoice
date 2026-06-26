@@ -5,8 +5,9 @@ module.exports = cds.service.impl(async function () {
     const S4_BD = await cds.connect.to("API_BILLING_DOCUMENT_SRV");
     const S4_CUST = await cds.connect.to("API_BUSINESS_PARTNER");
     const S4_irnno = await cds.connect.to("YY1_EINVOICESTATUS_CDS");
+    const S4_einvoice = await cds.connect.to("YY1_BILLINGDOCUMENTAPI_CDS");
 
-    const { BillingDocument, OverallBillingStatusVH, BusinesPartner,irnno } = this.entities;
+    const { BillingDocument, OverallBillingStatusVH, BusinesPartner,irnno, Billinginv, BillingStatusVH ,BillingStatusEinv} = this.entities;
 
     this.on("READ", BillingDocument, async (req) => {
         return await S4_BD.run(req.query.where(`(BillingDocumentType = 'F2' or BillingDocumentType = 'F5' or BillingDocumentType = 'F8' or BillingDocumentType = 'G2' or BillingDocumentType = 'L2')`));
@@ -134,7 +135,55 @@ module.exports = cds.service.impl(async function () {
    
 
 
-    // -------------
+    // --------------------------------------------------
+     this.on("READ", Billinginv, async (req) => {
+        return await S4_einvoice.run(req.query.where(`(BillingDocumentType = 'F2' or BillingDocumentType = 'F5' or BillingDocumentType = 'F8' or BillingDocumentType = 'G2' or BillingDocumentType = 'L2')`));
+    });
+
+
+    this.on('READ', 'BillingStatusVH', async () => {
+        return [
+            { code: 'A', name: 'Completed' },
+            { code: 'B', name: 'Incomplete' },
+            { code: 'C', name: 'Canceled' },
+            { code: 'D', name: 'Not Relevant' },
+            { code: 'E', name: 'To Be Posted' }
+        ];
+    });
+
+   this.after('READ', Billinginv, (data) => {
+
+    const statusMap = {
+        A: 'Completed',
+        B: 'Incomplete',
+        C: 'Canceled',
+        D: 'Not Relevant',
+        E: 'To Be Posted'
+    };
+
+    const rows = Array.isArray(data) ? data : [data];
+
+    rows.forEach(item => {
+        item.OverallBillingStatus  =
+            statusMap[item.OverallBillingStatus] || item.OverallBillingStatus;
+    });
+
+});
+
+ this.on('READ', 'EInvoiceStatusVH', async () => {
+    return [
+        { code: 'Submitted' },
+        { code: 'Not Submitted'}
+    ];
+});
+
+
+
+
+        
+
+
+    //---------------------
 
     this.on('BillingArray', async req => {
         try {

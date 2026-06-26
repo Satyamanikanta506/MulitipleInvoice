@@ -21,7 +21,8 @@
   },
   "scripts": {
     "start": "cds-serve",
-    "watch-billingdocument": "cds watch --open billingdocument/index.html?sap-ui-xx-viewCache=false --livereload false"
+    "watch-billingdocument": "cds watch --open billingdocument/index.html?sap-ui-xx-viewCache=false --livereload false",
+    "watch-billingdocumenteinvoice": "cds watch --open einvoice.billingdocumenteinvoice/index.html?sap-ui-xx-viewCache=false --livereload false"
   },
   "cds": {
     "requires": {
@@ -61,10 +62,25 @@
             "requestTimeout": 300000
           }
         }
+      },
+      "YY1_BILLINGDOCUMENTAPI_CDS": {
+        "kind": "odata-v2",
+        "model": "srv/external/YY1_BILLINGDOCUMENTAPI_CDS",
+        "[production]": {
+          "credentials": {
+            "destination": "S4HANA_DEV_BTP_COM_0120",
+            "path": "/sap/opu/odata/sap/YY1_BILLINGDOCUMENTAPI_CDS",
+            "requestTimeout": 300000
+          }
+        }
       }
     }
   },
   "sapux": [
-    "app/billingdocument"
+    "app/billingdocument",
+    "app/billingdocumenteinvoice"
+  ],
+  "workspaces": [
+    "app/*"
   ]
 }

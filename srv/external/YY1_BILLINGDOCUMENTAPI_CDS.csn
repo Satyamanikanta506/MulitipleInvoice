@@ -1,0 +1,144 @@
+{
+ "meta": {
+  "creator": "cds-dk 9.9.2"
+ },
+ "$version": "2.0",
+ "definitions": {
+  "YY1_BILLINGDOCUMENTAPI_CDS": {
+   "kind": "service",
+   "@cds.external": true,
+   "@m.IsDefaultEntityContainer": "true",
+   "@sap.message.scope.supported": "true",
+   "@sap.supported.formats": "atom json xlsx"
+  },
+  "YY1_BILLINGDOCUMENTAPI_CDS.YY1_BillingDocumentAPI": {
+   "kind": "entity",
+   "@cds.external": true,
+   "@cds.persistence.skip": true,
+   "@sap.creatable": "false",
+   "@sap.updatable": "false",
+   "@sap.deletable": "false",
+   "@sap.content.version": "1",
+   "@sap.label": "BillingDocumentAPI",
+   "elements": {
+    "BillingDocument": {
+     "key": true,
+     "type": "cds.String",
+     "length": 10,
+     "@sap.display.format": "UpperCase",
+     "@sap.required.in.filter": "false",
+     "@sap.label": "Billing Document",
+     "notNull": true
+    },
+    "BillingDocumentType": {
+     "type": "cds.String",
+     "length": 4,
+     "@sap.display.format": "UpperCase",
+     "@sap.required.in.filter": "false",
+     "@sap.label": "Billing Type"
+    },
+    "DistributionChannel": {
+     "type": "cds.String",
+     "length": 2,
+     "@sap.display.format": "UpperCase",
+     "@sap.required.in.filter": "false",
+     "@sap.label": "Distribution Channel"
+    },
+    "Division": {
+     "type": "cds.String",
+     "length": 2,
+     "@sap.display.format": "UpperCase",
+     "@sap.required.in.filter": "false",
+     "@sap.label": "Division"
+    },
+    "SoldToParty": {
+     "type": "cds.String",
+     "length": 10,
+     "@sap.display.format": "UpperCase",
+     "@sap.required.in.filter": "false",
+     "@sap.label": "Sold-to Party"
+    },
+    "OverallBillingStatus": {
+     "type": "cds.String",
+     "length": 1,
+     "@sap.display.format": "UpperCase",
+     "@sap.required.in.filter": "false",
+     "@sap.label": "Status",
+     "@sap.quickinfo": "SD Billing Status"
+    },
+    "BillingDocumentDate": {
+     "type": "cds.Date",
+     "@sap.display.format": "Date",
+     "@sap.required.in.filter": "false",
+     "@sap.label": "Billing Date"
+    },
+    "TotalNetAmount": {
+     "type": "cds.Decimal",
+     "precision": 16,
+     "scale": 3,
+     "@sap.required.in.filter": "false",
+     "@sap.unit": "TransactionCurrency",
+     "@sap.label": "Net Value",
+     "@sap.quickinfo": "Net Value in Document Currency"
+    },
+    "YY1_Plant_BDH": {
+     "type": "cds.String",
+     "length": 4,
+     "@sap.required.in.filter": "false",
+     "@sap.label": "Plant"
+    },
+    "TransactionCurrency": {
+     "type": "cds.String",
+     "length": 5,
+     "@sap.display.format": "UpperCase",
+     "@sap.required.in.filter": "false",
+     "@sap.label": "Document Currency",
+     "@sap.quickinfo": "SD Document Currency",
+     "@sap.semantics": "currency-code"
+    },
+    "ElectronicDocUUID": {
+     "type": "cds.UUID",
+     "@sap.display.format": "UpperCase",
+     "@sap.required.in.filter": "false",
+     "@sap.label": "eDocument GUID",
+     "@sap.quickinfo": "eDocument: GUID"
+    },
+    "IN_ElectronicDocInvcRefNmbr": {
+     "type": "cds.String",
+     "length": 64,
+     "@sap.display.format": "UpperCase",
+     "@sap.required.in.filter": "false",
+     "@sap.label": "Invc Reference Nmbr",
+     "@sap.quickinfo": "eDocument India eInvoice: Invoice Registration Number(IRN)"
+    },
+    "Payer": {
+     "type": "cds.String",
+     "length": 93,
+     "@sap.required.in.filter": "false",
+     "@sap.label": "PayertoParty"
+    },
+    "PayerParty": {
+     "type": "cds.String",
+     "length": 10,
+     "@sap.display.format": "UpperCase",
+     "@sap.required.in.filter": "false",
+     "@sap.label": "Payer"
+    },
+    "CustomerFullName": {
+     "type": "cds.String",
+     "length": 220,
+     "@sap.display.format": "UpperCase",
+     "@sap.required.in.filter": "false",
+     "@sap.label": "Customer Name",
+     "@sap.quickinfo": "Customer Full Name"
+    },
+    "E_InvoiceStatus": {
+     "type": "cds.String",
+     "length": 13,
+     "@sap.required.in.filter": "false",
+     "@sap.label": "E_InvoiceStatus"
+    }
+   }
+  }
+ }
+}

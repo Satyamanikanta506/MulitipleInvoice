@@ -82,6 +82,7 @@ service konnekt {
         YY1_Plant_BDH,
         @title : 'E Invoice Status'
         E_InvoiceStatus,
+        virtual null as EInvoiceCriticality : Integer
         
     }
    action BillingArrayy(BillingDocument : String) returns {
@@ -99,6 +100,9 @@ service konnekt {
     name     : String(50);
     }
 
+    entity PlantVH {
+    key Plant : String;
+    }
 
     
 }

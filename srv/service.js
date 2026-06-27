@@ -7,7 +7,7 @@ module.exports = cds.service.impl(async function () {
     const S4_irnno = await cds.connect.to("YY1_EINVOICESTATUS_CDS");
     const S4_einvoice = await cds.connect.to("YY1_BILLINGDOCUMENTAPI_CDS");
 
-    const { BillingDocument, OverallBillingStatusVH, BusinesPartner,irnno, Billinginv, BillingStatusVH ,BillingStatusEinv} = this.entities;
+    const { BillingDocument, OverallBillingStatusVH, BusinesPartner,irnno, Billinginv, BillingStatusVH , EInvoiceStatusVH, BillingStatusEinv, PlantVH} = this.entities;
 
     this.on("READ", BillingDocument, async (req) => {
         return await S4_BD.run(req.query.where(`(BillingDocumentType = 'F2' or BillingDocumentType = 'F5' or BillingDocumentType = 'F8' or BillingDocumentType = 'G2' or BillingDocumentType = 'L2')`));
@@ -147,12 +147,54 @@ module.exports = cds.service.impl(async function () {
 
 });
 
- this.on('READ', 'EInvoiceStatusVH', async () => {
-    return [
+    this.on('READ', EInvoiceStatusVH, async () => {
+     return [
         { code: 'Submitted' },
-        { code: 'Not Submitted'}
+        { code: 'Not Submitted'},
+        // { code: 'Error'}
     ];
 });
+    
+
+
+    this.on("READ", PlantVH, async () => {
+    return [
+        { Plant: "01AP" },
+        { Plant: "01JH" },
+        { Plant: "01KA" },
+        { Plant: "01MH" },
+        { Plant: "01MP" },
+        { Plant: "01OD" },
+        { Plant: "01TG" },
+        { Plant: "01TN" },
+        { Plant: "02MH" },
+        { Plant: "02MP" },
+        { Plant: "02TG" },
+        { Plant: "03MP" },
+        { Plant: "03TG" },
+        { Plant: "04MP" },
+        { Plant: "09MP" }
+    ];
+});
+//     this.after("READ", Billinginv, (rows) => {
+//     const data = Array.isArray(rows) ? rows : [rows];
+
+//   data.forEach(item => {
+//     if (item.E_InvoiceStatus === "Submitted") {
+//       item.EInvoiceCriticality = 3; // Green
+//     } else if (item.E_InvoiceStatus === "Error") {
+//       item.EInvoiceCriticality = 1; // Red
+//     } else {
+//       item.EInvoiceCriticality = 2; // Orange
+//     }
+//   });
+// });
+
+
+
+
+
+
 
     this.on('BillingArray', async req => {
         try {

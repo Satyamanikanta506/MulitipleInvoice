@@ -173,6 +173,7 @@ annotate konnekt.Billinginv with @(
                 Label : 'E-Invoice Status',
                 ![@HTML5.CssDefaults]: {width:'9rem'},
                 Value : E_InvoiceStatus,
+                Criticality : EInvoiceCriticality
             },
             {
                 $Type : 'UI.DataField',
@@ -258,12 +259,20 @@ annotate konnekt.Billinginv with @(
                 LocalDataProperty : E_InvoiceStatus,
                 ValueListProperty : 'code'
             },
-            {
-                $Type : 'Common.ValueListParameterDisplayOnly',
-                ValueListProperty : 'name'
-            }
         ]
     };
 
-
+     YY1_Plant_BDH @Common.ValueListWithFixedValues : true;
+     YY1_Plant_BDH @Common.ValueList : {
+        Label : 'Plant',
+        CollectionPath : 'PlantVH',
+        Parameters : [
+            {
+                $Type : 'Common.ValueListParameterInOut',
+                LocalDataProperty : YY1_Plant_BDH,
+                ValueListProperty : 'Plant'
+            },
+        ],
+        PresentationVariantQualifier : 'Compact'
+    };
 };

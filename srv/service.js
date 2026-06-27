@@ -131,11 +131,11 @@ module.exports = cds.service.impl(async function () {
    this.after('READ', Billinginv, (data) => {
 
     const statusMap = {
-        A: 'Completed',
-        B: 'Incomplete',
-        C: 'Canceled',
-        D: 'Not Relevant',
-        E: 'To Be Posted'
+        A: 'Completed (A)',
+        B: 'Incomplete (B)',
+        C: 'Canceled (C)',
+        D: 'Not Relevant (D)',
+        E: 'To Be Posted (E)'
     };
 
     const rows = Array.isArray(data) ? data : [data];

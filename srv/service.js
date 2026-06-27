@@ -47,7 +47,7 @@ module.exports = cds.service.impl(async function () {
                     SELECT.from(BusinesPartner)
                         .where({ Customer: { in: queryParties } })
                 );
-
+                
                 const bpMap = {};
                 bpData.forEach(bp => {
                     if (bp.Customer) {
@@ -61,7 +61,6 @@ module.exports = cds.service.impl(async function () {
                         bpMap[unpaddedBP] = bp.BusinessPartnerFullName;
                     }
                 });
-
                 data.forEach(item => {
                     if (item.SoldToParty) {
                         item.SoldToPartyText = bpMap[item.SoldToParty] || bpMap[item.SoldToParty.padStart(10, '0')] || '';
@@ -75,7 +74,6 @@ module.exports = cds.service.impl(async function () {
        
         // IRN Data
         try {
-        
             const irnData = await S4_irnno.run(
                 SELECT.from(irnno)
             );
@@ -85,21 +83,14 @@ module.exports = cds.service.impl(async function () {
             irnData.forEach(irn => {
                 irnMap[irn.BillingDocument] =
                     irn.IN_ElectronicDocInvcRefNmbr;
-            });
-        
-            data.forEach(item => {
-            
+            });        
+            data.forEach(item => {            
                 const irnValue =
                     irnMap[item.BillingDocument] || "";
-
             item.IN_ElectronicDocInvcRefNmbr =
             irnValue ? "Submitted" : "Not Submitted";
-
-
-            
             item.EInvoiceCriticality =
                 irnValue ? 3 : 2;   // 3=Green, 2=Orange
-
         });
         } catch (err) {
 
@@ -107,17 +98,9 @@ module.exports = cds.service.impl(async function () {
               item.IN_ElectronicDocInvcRefNmbr = "Not Submitted";
               item.EInvoiceCriticality = 2;
         });
-
     }
 
-
     });
-
-
-
-
-
-
     this.on("READ", OverallBillingStatusVH, async (req) => {
         const statuses = [
             { code: 'A', name: 'Completed' },
@@ -129,13 +112,7 @@ module.exports = cds.service.impl(async function () {
         return statuses;
     });
 
-    // this.on("READ", irnno, async (req) =>{
-    //     return await S4_irnno.run(req.query);
-    // } )
-   
-
-
-    // --------------------------------------------------
+   //-------
      this.on("READ", Billinginv, async (req) => {
         return await S4_einvoice.run(req.query.where(`(BillingDocumentType = 'F2' or BillingDocumentType = 'F5' or BillingDocumentType = 'F8' or BillingDocumentType = 'G2' or BillingDocumentType = 'L2')`));
     });
@@ -177,14 +154,6 @@ module.exports = cds.service.impl(async function () {
     ];
 });
 
-
-
-
-        
-
-
-    //---------------------
-
     this.on('BillingArray', async req => {
         try {
             const sBillingDocuments = req.data.BillingDocument;
@@ -207,7 +176,7 @@ module.exports = cds.service.impl(async function () {
 
             for (const BillDocId of aDocIds) {
                 try {
-                    const printPdf = await S4_BD.tx().send({
+                    const printPdf = await billingDocService.tx().send({
                         method: 'GET',
                         path: `GetPDF?BillingDocument='${BillDocId}'`
                     });
@@ -276,9 +245,7 @@ module.exports = cds.service.impl(async function () {
 
 
 
-    ///-----------------
-
-
+    ///-----------------Billing Document Einvoice code
      this.on('BillingArrayy', async req => {
         try {
             const sBillingDocuments = req.data.BillingDocument;
@@ -301,7 +268,7 @@ module.exports = cds.service.impl(async function () {
 
             for (const BillDocId of aDocIds) {
                 try {
-                    const printPdf = await billingDocService.tx().send({
+                    const printPdf = await S4_BD.tx().send({
                         method: 'GET',
                         path: `GetPDF?BillingDocument='${BillDocId}'`
                     });

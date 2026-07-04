@@ -120,11 +120,12 @@ module.exports = cds.service.impl(async function () {
 
     this.on('READ', 'BillingStatusVH', async () => {
         return [
-            { code: 'A', name: 'Completed' },
-            { code: 'B', name: 'Incomplete' },
             { code: 'C', name: 'Canceled' },
+            { code: 'A', name: 'Completed' },
+            { code: 'E', name: 'Incomplete' },
             { code: 'D', name: 'Not Relevant' },
-            { code: 'E', name: 'To Be Posted' }
+            { code: 'B', name: 'To Be Posted' },
+            
         ];
     });
 
@@ -132,10 +133,10 @@ module.exports = cds.service.impl(async function () {
 
     const statusMap = {
         A: 'Completed (A)',
-        B: 'Incomplete (B)',
+        B: 'To Be Posted (B)',
         C: 'Canceled (C)',
         D: 'Not Relevant (D)',
-        E: 'To Be Posted (E)'
+        E: 'Incomplete (E)'
     };
 
     const rows = Array.isArray(data) ? data : [data];

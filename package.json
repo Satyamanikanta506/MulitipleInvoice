@@ -35,7 +35,7 @@
         "model": "srv/external/API_BILLING_DOCUMENT_SRV",
         "[production]": {
           "credentials": {
-            "destination": "S4HANA_DEV_BTP_COM_0120",
+            "destination": "BILLINGDOCUMENT_EINVOICE",
             "path": "/sap/opu/odata/sap/API_BILLING_DOCUMENT_SRV",
             "requestTimeout": 300000
           }
@@ -46,7 +46,7 @@
         "model": "srv/external/API_BUSINESS_PARTNER",
         "[production]": {
           "credentials": {
-            "destination": "S4HANA_DEV_BTP_COM_0120",
+            "destination": "BILLINGDOCUMENT_EINVOICE",
             "path": "/sap/opu/odata/sap/API_BUSINESS_PARTNER",
             "requestTimeout": 300000
           }
@@ -57,7 +57,7 @@
         "model": "srv/external/YY1_EINVOICESTATUS_CDS",
         "[production]": {
           "credentials": {
-            "destination": "S4HANA_DEV_BTP_COM_0120",
+            "destination": "BILLINGDOCUMENT_EINVOICE",
             "path": "/sap/opu/odata/sap/YY1_EINVOICESTATUS_CDS",
             "requestTimeout": 300000
           }
@@ -68,7 +68,7 @@
         "model": "srv/external/YY1_BILLINGDOCUMENTAPI_CDS",
         "[production]": {
           "credentials": {
-            "destination": "S4HANA_DEV_BTP_COM_0120",
+            "destination": "BILLINGDOCUMENT_EINVOICE",
             "path": "/sap/opu/odata/sap/YY1_BILLINGDOCUMENTAPI_CDS",
             "requestTimeout": 300000
           }

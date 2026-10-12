@@ -7,7 +7,7 @@ module.exports = cds.service.impl(async function () {
     const S4_irnno = await cds.connect.to("YY1_EINVOICESTATUS_CDS");
     const S4_einvoice = await cds.connect.to("YY1_BILLINGDOCUMENTAPI_CDS");
 
-    const { BillingDocument, OverallBillingStatusVH, BusinesPartner,irnno, Billinginv, BillingStatusVH , EInvoiceStatusVH, BillingStatusEinv, PlantVH} = this.entities;
+    const { BillingDocument, OverallBillingStatusVH, BusinesPartner,irnno, Billinginv, BillingStatusVH , EInvoiceStatusVH, BillingStatusEinv, PlantVH, CompanyCodeVH} = this.entities;
 
     this.on("READ", BillingDocument, async (req) => {
         return await S4_BD.run(req.query.where(`(BillingDocumentType = 'F2' or BillingDocumentType = 'F5' or BillingDocumentType = 'F8' or BillingDocumentType = 'G2' or BillingDocumentType = 'L2')`));
@@ -155,9 +155,37 @@ module.exports = cds.service.impl(async function () {
         // { code: 'Error'}
     ];
 });
-    
+    //---------
+   this.on("READ", CompanyCodeVH, async () => {
+    return [
+        { CompanyCode: "IN01" },
+        { CompanyCode: "IN04" },
+        { CompanyCode: "EU06" },
+        { CompanyCode: "TH01" },
+        { CompanyCode: "UK01" },
+        { CompanyCode: "UK02" },
+        { CompanyCode: "SG01" },
+        { CompanyCode: "SG02" },
+        { CompanyCode: "SG03" },
+        { CompanyCode: "HK01" },
+        { CompanyCode: "ME01" },
+        { CompanyCode: "ME02" },
+        { CompanyCode: "ME03" },
+        { CompanyCode: "ME04" },
+        { CompanyCode: "ME05" },
+        { CompanyCode: "ME06" },
+        { CompanyCode: "ME07" },
+        { CompanyCode: "ME08" },
+        { CompanyCode: "ME09" },
+        { CompanyCode: "ME10" },
+        { CompanyCode: "MY01" },
+        { CompanyCode: "AU01" },
+        { CompanyCode: "US01" }
+    ];
+});
 
 
+//----
     this.on("READ", PlantVH, async () => {
     return [
         { Plant: "01AP" },
@@ -174,7 +202,27 @@ module.exports = cds.service.impl(async function () {
         { Plant: "03MP" },
         { Plant: "03TG" },
         { Plant: "04MP" },
-        { Plant: "09MP" }
+        { Plant: "09MP" },
+        { Plant: "06EU" },
+        { Plant: "01TH" },
+        { Plant: "01UK" },
+        { Plant: "02UK" },
+        { Plant: "01SG" },
+        { Plant: "02SG" },
+        { Plant: "03SG" },
+        { Plant: "01HK" },
+        { Plant: "01ME" },
+        { Plant: "02ME" },
+        { Plant: "03ME" },
+        { Plant: "04ME" },
+        { Plant: "05ME" },
+        { Plant: "06ME" },
+        { Plant: "08ME" },
+        { Plant: "09ME" },
+        { Plant: "10ME" },
+        { Plant: "01MY" },
+        { Plant: "01AU" },
+        { Plant: "01US" }
     ];
 });
 //     this.after("READ", Billinginv, (rows) => {

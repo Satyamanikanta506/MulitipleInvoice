@@ -137,6 +137,13 @@
      "length": 13,
      "@sap.required.in.filter": "false",
      "@sap.label": "E_InvoiceStatus"
+    },
+    "CompanyCode": {
+     "type": "cds.String",
+     "length": 4,
+     "@sap.display.format": "UpperCase",
+     "@sap.required.in.filter": "false",
+     "@sap.label": "Company Code"
     }
    }
   }

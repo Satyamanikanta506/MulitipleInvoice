@@ -24,7 +24,8 @@ service konnekt {
         YY1_Plant_BDH,
         @title : 'E Invoice Status'
         virtual null as IN_ElectronicDocInvcRefNmbr : String(20),
-        virtual null as EInvoiceCriticality : Integer
+        virtual null as EInvoiceCriticality : Integer,
+        CompanyCode
     }
 
     action BillingArray(BillingDocument : String) returns {
@@ -76,13 +77,16 @@ service konnekt {
         TotalNetAmount,
         @title : 'Billing Document Status'
         OverallBillingStatus,
+       
 
         virtual null as BillingStatusDesc : String(50),
         @title : 'Plant'
         YY1_Plant_BDH,
         @title : 'E Invoice Status'
         E_InvoiceStatus,
-        virtual null as EInvoiceCriticality : Integer
+        virtual null as EInvoiceCriticality : Integer,
+        CompanyCode
+       
         
     }
    action BillingArrayy(BillingDocument : String) returns {
@@ -103,6 +107,9 @@ service konnekt {
     entity PlantVH {
     key Plant : String;
     }
-
+    entity CompanyCodeVH {
+    key CompanyCode : String;
+        CompanyName : String;
+    }
     
 }

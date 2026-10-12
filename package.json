@@ -73,6 +73,10 @@
             "requestTimeout": 300000
           }
         }
+      },
+      "YY1_BILLINGDOCUMENTAPI_CDS_0001": {
+        "kind": "odata-v2",
+        "model": "srv/external/YY1_BILLINGDOCUMENTAPI_CDS_0001"
       }
     }
   },

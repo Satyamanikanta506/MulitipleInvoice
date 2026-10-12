@@ -30,6 +30,13 @@ annotate konnekt.BillingDocument with @(
         UI.LineItem: [
             {
                 $Type : 'UI.DataField',
+                Label : 'Company Code',
+                ![@HTML5.CssDefaults]: {width:'9rem'},
+                Value : CompanyCode,
+                //Criticality : EInvoiceCriticality
+            },
+            {
+                $Type : 'UI.DataField',
                 Label : 'E-Invoice Status',
                 ![@HTML5.CssDefaults]: {width:'9rem'},
                 Value : IN_ElectronicDocInvcRefNmbr,
@@ -168,6 +175,14 @@ annotate konnekt.Billinginv with @(
     },
 
         UI.LineItem: [
+             {
+                $Type : 'UI.DataField',
+                Label : 'Company Code',
+                ![@HTML5.CssDefaults]: {width:'8rem'},
+                Value : CompanyCode,
+                //Criticality : EInvoiceCriticality
+            },
+             
             {
                 $Type : 'UI.DataField',
                 Label : 'E-Invoice Status',
@@ -217,10 +232,11 @@ annotate konnekt.Billinginv with @(
                 Label : 'Plant',
                 ![@HTML5.CssDefaults]: {width:'5rem'},
                 Value : YY1_Plant_BDH,
-            }
+            },
+           
 
     ],
-    UI.SelectionFields: [ E_InvoiceStatus, BillingDocument, BillingDocumentType, SoldToParty, OverallBillingStatus, BillingDocumentDate, YY1_Plant_BDH ],
+    UI.SelectionFields: [CompanyCode, E_InvoiceStatus, BillingDocument, BillingDocumentType, SoldToParty, OverallBillingStatus, BillingDocumentDate, YY1_Plant_BDH ],
     UI.HeaderInfo : {
         TypeName: 'Billing Document',
         TypeNamePlural: 'Billing Documents',
@@ -231,6 +247,7 @@ annotate konnekt.Billinginv with @(
    annotate konnekt.Billinginv with {
 
     OverallBillingStatus @Common.ValueListWithFixedValues : true;
+   
 
     OverallBillingStatus @Common.ValueList : {
         Label : 'Billing Status',
@@ -275,4 +292,19 @@ annotate konnekt.Billinginv with @(
         ],
         PresentationVariantQualifier : 'Compact'
     };
+    CompanyCode @Common.ValueListWithFixedValues : true;
+
+    CompanyCode @Common.ValueList : {
+        Label : 'Company Code',
+        CollectionPath : 'CompanyCodeVH',
+        Parameters : [
+            {
+                $Type : 'Common.ValueListParameterInOut',
+                LocalDataProperty : CompanyCode,
+                ValueListProperty : 'CompanyCode'
+            }
+        ]
+    };
+
 };
+

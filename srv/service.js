@@ -160,6 +160,7 @@ module.exports = cds.service.impl(async function () {
     return [
         { CompanyCode: "IN01" },
         { CompanyCode: "IN04" },
+        { CompanyCode: "IN08" },
         { CompanyCode: "EU06" },
         { CompanyCode: "TH01" },
         { CompanyCode: "UK01" },

@@ -18,7 +18,7 @@ modules:
       buildpack: nodejs_buildpack
       stack: cflinuxfs4
       disk-quota: 1024M
-      memory: 256M
+      memory: 512M
     build-parameters:
       builder: npm-ci
     provides:

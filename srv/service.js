@@ -200,9 +200,12 @@ module.exports = cds.service.impl(async function () {
         { Plant: "02MH" },
         { Plant: "02MP" },
         { Plant: "02TG" },
-        { Plant: "03MP" },
         { Plant: "03TG" },
+        { Plant: "04TG" },
+        { Plant: "05TG" },
+        { Plant: "03MP" },
         { Plant: "04MP" },
+        { Plant: "05MP" },
         { Plant: "09MP" },
         { Plant: "06EU" },
         { Plant: "01TH" },
@@ -349,7 +352,7 @@ module.exports = cds.service.impl(async function () {
             if (aDocIds.length === 0) {
                 throw new Error('No valid BillingDocument IDs provided');
             }
-
+           
             const billingDocService = await cds.connect.to('YY1_BILLINGDOCUMENTAPI_CDS');
             const archiver = require('archiver');
             const { PassThrough } = require('stream');

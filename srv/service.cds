@@ -34,16 +34,6 @@ service konnekt {
     };
 
 
-
-    @readonly
-    @cds.persistence.skip
-    entity OverallBillingStatusVH {
-        @Common.Text: name
-        @Common.TextArrangement: #TextFirst
-        key code : String(1);
-        name : String;
-    }
-
     @cds.persistence.skip
     entity BusinesPartner as projection on S4_CUST.A_BusinessPartner{
         key BusinessPartner,
@@ -58,13 +48,7 @@ service konnekt {
         IN_ElectronicDocInvcRefNmbr
     };
 
-//     entity irnno as projection on S4_IRN.YY1_EInvoiceStatus {
-//     key BillingDocument,
-//     ElectronicDocUUID,
 
-//     irn : Association to irnno
-//         on irn.ElectronicDocUUID = ElectronicDocUUID
-// }
     entity Billinginv as projection on S4_Einvoice.YY1_BillingDocumentAPI{
         @title : 'Billing Document'
         key BillingDocument,

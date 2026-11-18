@@ -21,7 +21,6 @@
   },
   "scripts": {
     "start": "cds-serve",
-    "watch-billingdocument": "cds watch --open billingdocument/index.html?sap-ui-xx-viewCache=false --livereload false",
     "watch-billingdocumenteinvoice": "cds watch --open einvoice.billingdocumenteinvoice/index.html?sap-ui-xx-viewCache=false --livereload false"
   },
   "cds": {
@@ -81,7 +80,6 @@
     }
   },
   "sapux": [
-    "app/billingdocument",
     "app/billingdocumenteinvoice"
   ],
   "workspaces": [

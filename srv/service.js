@@ -7,21 +7,13 @@ module.exports = cds.service.impl(async function () {
     const S4_irnno = await cds.connect.to("YY1_EINVOICESTATUS_CDS");
     const S4_einvoice = await cds.connect.to("YY1_BILLINGDOCUMENTAPI_CDS");
 
-    const { BillingDocument, OverallBillingStatusVH, BusinesPartner,irnno, Billinginv, BillingStatusVH , EInvoiceStatusVH, BillingStatusEinv, PlantVH, CompanyCodeVH} = this.entities;
+    const { BillingDocument , BusinesPartner,irnno, Billinginv, BillingStatusVH , EInvoiceStatusVH,  PlantVH, CompanyCodeVH} = this.entities;
 
     this.on("READ", BillingDocument, async (req) => {
         return await S4_BD.run(req.query.where(`(BillingDocumentType = 'F2' or BillingDocumentType = 'F5' or BillingDocumentType = 'F8' or BillingDocumentType = 'G2' or BillingDocumentType = 'L2')`));
     });
     
     this.after("READ", BillingDocument, async (data) => {
-
-        const statusMap = {
-            A: "Completed",
-            B: "Incomplete",
-            C: "Canceled",
-            D: "Not Relevant",
-            E: "To Be Posted"
-        };
 
         if (!Array.isArray(data)) {
             data = [data];
@@ -101,18 +93,7 @@ module.exports = cds.service.impl(async function () {
     }
 
     });
-    this.on("READ", OverallBillingStatusVH, async (req) => {
-        const statuses = [
-            { code: 'A', name: 'Completed' },
-            { code: 'B', name: 'Incomplete' },
-            { code: 'C', name: 'Canceled' },
-            { code: 'D', name: 'Not Relevant' },
-            { code: 'E', name: 'To Be Posted' }
-        ];
-        return statuses;
-    });
-
-   //-------
+   
      this.on("READ", Billinginv, async (req) => {
         return await S4_einvoice.run(req.query.where(`(BillingDocumentType = 'F2' or BillingDocumentType = 'F5' or BillingDocumentType = 'F8' or BillingDocumentType = 'G2' or BillingDocumentType = 'L2')`));
     });
@@ -229,118 +210,11 @@ module.exports = cds.service.impl(async function () {
         { Plant: "01US" }
     ];
 });
-//     this.after("READ", Billinginv, (rows) => {
-//     const data = Array.isArray(rows) ? rows : [rows];
-
-//   data.forEach(item => {
-//     if (item.E_InvoiceStatus === "Submitted") {
-//       item.EInvoiceCriticality = 3; // Green
-//     } else if (item.E_InvoiceStatus === "Error") {
-//       item.EInvoiceCriticality = 1; // Red
-//     } else {
-//       item.EInvoiceCriticality = 2; // Orange
-//     }
-//   });
-// });
 
 
 
 
-
-
-
-    this.on('BillingArray', async req => {
-        try {
-            const sBillingDocuments = req.data.BillingDocument;
-            if (!sBillingDocuments) {
-                throw new Error('Missing required BillingDocument list');
-            }
-
-            const aDocIds = sBillingDocuments.split(',').map(id => id.trim()).filter(Boolean);
-            if (aDocIds.length === 0) {
-                throw new Error('No valid BillingDocument IDs provided');
-            }
-
-            const billingDocService = await cds.connect.to('API_BILLING_DOCUMENT_SRV');
-            const archiver = require('archiver');
-            const { PassThrough } = require('stream');
-
-            const successDocs = [];
-            const failedDocs = [];
-            const zipFiles = [];
-
-            for (const BillDocId of aDocIds) {
-                try {
-                    const printPdf = await billingDocService.tx().send({
-                        method: 'GET',
-                        path: `GetPDF?BillingDocument='${BillDocId}'`
-                    });
-
-                    if (printPdf?.GetPDF?.BillingDocumentBinary) {
-                        const cleanPdfBinary = printPdf.GetPDF.BillingDocumentBinary.replace(/(\r\n|\n|\r)/gm, "");
-                        const fileBytes = Buffer.from(cleanPdfBinary, 'base64');
-                        zipFiles.push({
-                            name: `${BillDocId}.pdf`,
-                            content: fileBytes
-                        });
-                        successDocs.push(BillDocId);
-                    } else {
-                        console.warn(`Failed to retrieve PDF document for ID: ${BillDocId}`);
-                        failedDocs.push(`${BillDocId} (Empty Binary)`);
-                    }
-                } catch (err) {
-                    console.error(`Error fetching PDF for ID ${BillDocId}:`, err);
-                    failedDocs.push(`${BillDocId} (${err.message || 'Request failed'})`);
-                }
-            }
-
-            if (zipFiles.length === 0) {
-                throw new Error('No PDF documents could be retrieved. Errors:\n' + failedDocs.join('\n'));
-            }
-
-            // Create ZIP in memory using archiver
-            const zipBuffer = await new Promise((resolve, reject) => {
-                const archive = archiver('zip', { zlib: { level: 9 } });
-                const buffers = [];
-                const stream = new PassThrough();
-                
-                stream.on('data', data => buffers.push(data));
-                stream.on('end', () => resolve(Buffer.concat(buffers)));
-                stream.on('error', err => reject(err));
-                
-                archive.pipe(stream);
-                
-                for (const file of zipFiles) {
-                    archive.append(file.content, { name: file.name });
-                }
-                
-                archive.finalize();
-            });
-
-            const zipBase64 = zipBuffer.toString('base64');
-
-            let errorMessages = "";
-            if (failedDocs.length > 0) {
-                errorMessages = failedDocs.map(entry => `- ${entry}`).join('\n');
-            }
-
-            return {
-                zipContent: zipBase64,
-                errorMessages: errorMessages
-            };
-        } catch (error) {
-            console.error('Error in BillingArray handler:', error);
-            throw new cds.error({
-                code: 'BILLING_ARRAY_ERROR',
-                message: error.message || 'Failed to process and zip PDF documents',
-                status: 500
-            });
-        }
-    });
-
-
-
-    ///-----------------Billing Document Einvoice code
+    ///---Billing Document Einvoice code
      this.on('BillingArrayy', async req => {
         try {
             const sBillingDocuments = req.data.BillingDocument;
@@ -353,25 +227,24 @@ module.exports = cds.service.impl(async function () {
                 throw new Error('No valid BillingDocument IDs provided');
             }
            
-            const billingDocService = await cds.connect.to('YY1_BILLINGDOCUMENTAPI_CDS');
             const archiver = require('archiver');
             const { PassThrough } = require('stream');
 
             const successDocs = [];
             const failedDocs = [];
             const zipFiles = [];
-
+            
             for (const BillDocId of aDocIds) {
                 try {
-                    const printPdf = await S4_BD.tx().send({
+                const printPdf = await S4_BD.tx().send({
                         method: 'GET',
                         path: `GetPDF?BillingDocument='${BillDocId}'`
                     });
 
-                    if (printPdf?.GetPDF?.BillingDocumentBinary) {
-                        const cleanPdfBinary = printPdf.GetPDF.BillingDocumentBinary.replace(/(\r\n|\n|\r)/gm, "");
-                        const fileBytes = Buffer.from(cleanPdfBinary, 'base64');
-                        zipFiles.push({
+                if (printPdf?.GetPDF?.BillingDocumentBinary) {
+                const cleanPdfBinary = printPdf.GetPDF.BillingDocumentBinary.replace(/(\r\n|\n|\r)/gm, "");
+                const fileBytes = Buffer.from(cleanPdfBinary, 'base64');
+                      zipFiles.push({
                             name: `${BillDocId}.pdf`,
                             content: fileBytes
                         });
@@ -391,7 +264,7 @@ module.exports = cds.service.impl(async function () {
             }
 
             // Create ZIP in memory using archiver
-            const zipBuffer = await new Promise((resolve, reject) => {
+                const zipBuffer = await new Promise((resolve, reject) => {
                 const archive = archiver('zip', { zlib: { level: 9 } });
                 const buffers = [];
                 const stream = new PassThrough();
@@ -409,7 +282,7 @@ module.exports = cds.service.impl(async function () {
                 archive.finalize();
             });
 
-            const zipBase64 = zipBuffer.toString('base64');
+               const zipBase64 = zipBuffer.toString('base64');
 
             let errorMessages = "";
             if (failedDocs.length > 0) {
@@ -430,3 +303,4 @@ module.exports = cds.service.impl(async function () {
         }
     });
 });
+

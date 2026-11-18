@@ -1,1 +1,0 @@
-using konnekt as service from '../../srv/service';

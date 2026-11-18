@@ -332,7 +332,7 @@ module.exports = cds.service.impl(async function () {
                             .replace(/\s+/g, ' ')
                             .trim();
 
-                        const pdfFileName = cleanPayerName ? `${BillDocId} - ${cleanPayerName}).pdf` : `${BillDocId}.pdf`;
+                        const pdfFileName = cleanPayerName ? `${BillDocId} - ${cleanPayerName}.pdf` : `${BillDocId}.pdf`;
 
                         zipFiles.push({
                             name: pdfFileName,

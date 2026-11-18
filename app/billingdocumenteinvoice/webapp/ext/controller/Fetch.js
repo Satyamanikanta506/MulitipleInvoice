@@ -26,15 +26,17 @@ sap.ui.define([
 
             var aBillingDocData = aSelectedContexts.map(function (oContext) {
                 var oObj = oContext.getObject();
-                var sBP = oObj.BusinessPartnerName || oObj.CustomerFullName || oObj.SoldToPartyText || "";
+                var sPayerRaw = (oObj.Payer || "").trim();
+                // Extract clean Payer Name (remove trailing customer code like " (20000032)")
+                var sPayerName = sPayerRaw.replace(/\s*\(\d+\)\s*$/, "").trim() || sPayerRaw;
                 return {
                     BillingDocument: oObj.BillingDocument,
-                    BusinessPartnerName: sBP
+                    PayerName: sPayerName
                 };
             });
 
-            var bHasBPName = aBillingDocData.some(function (item) { return !!item.BusinessPartnerName; });
-            var sBillingDocuments = bHasBPName
+            var bHasPayerName = aBillingDocData.some(function (item) { return !!item.PayerName; });
+            var sBillingDocuments = bHasPayerName
                 ? JSON.stringify(aBillingDocData)
                 : aBillingDocData.map(function (item) { return item.BillingDocument; }).join(",");
 
@@ -80,16 +82,10 @@ sap.ui.define([
 
                 var oBlob = base64ToBlob(sZipContent, "application/zip");
                 
-                // Determine filename
+                // Determine filename for the downloaded ZIP
                 var sFileName = "Invoices";
                 if (aBillingDocData.length === 1) {
-                    var oFirst = aBillingDocData[0];
-                    if (oFirst.BusinessPartnerName) {
-                        var sCleanBP = oFirst.BusinessPartnerName.replace(/[/\\?%*:|"<>]/g, '').trim();
-                        sFileName = "Invoice_" + oFirst.BillingDocument + (sCleanBP ? "(" + sCleanBP + ")" : "");
-                    } else {
-                        sFileName = "Invoice_" + oFirst.BillingDocument;
-                    }
+                    sFileName = "Invoice_" + aBillingDocData[0].BillingDocument;
                 } else {
                     sFileName = "Invoices_" + new Date().toISOString().slice(0, 10);
                 }

@@ -231,7 +231,7 @@ module.exports = cds.service.impl(async function () {
             }
 
             let docList = [];
-            const bpNameFromInput = {};
+            const payerNameFromInput = {};
 
             // Support JSON array of objects/strings as well as comma-separated IDs
             if (typeof sBillingDocuments === 'string' && (sBillingDocuments.trim().startsWith('[') || sBillingDocuments.trim().startsWith('{'))) {
@@ -243,10 +243,12 @@ module.exports = cds.service.impl(async function () {
                             const id = (item.BillingDocument || item.id || '').trim();
                             if (id) {
                                 docList.push(id);
-                                const bpName = (item.BusinessPartnerName || item.CustomerFullName || item.SoldToPartyText || '').trim();
-                                if (bpName) {
-                                    bpNameFromInput[id] = bpName;
-                                    bpNameFromInput[id.replace(/^0+/, '')] = bpName;
+                                let name = (item.PayerName || item.Payer || item.CustomerFullName || item.BusinessPartnerName || '').trim();
+                                if (name) {
+                                    // Remove trailing customer code like " (20000032)"
+                                    const cleanName = name.replace(/\s*\(\d+\)\s*$/, '').trim() || name;
+                                    payerNameFromInput[id] = cleanName;
+                                    payerNameFromInput[id.replace(/^0+/, '')] = cleanName;
                                 }
                             }
                         } else if (typeof item === 'string' && item.trim()) {
@@ -267,154 +269,40 @@ module.exports = cds.service.impl(async function () {
                 throw new Error('No valid BillingDocument IDs provided');
             }
 
-            // Map to store docId -> BusinessPartnerName
-            const docToBpNameMap = { ...bpNameFromInput };
+            // Map to store docId -> PayerName
+            const docToPayerNameMap = { ...payerNameFromInput };
 
-            // Find doc IDs that still need BusinessPartnerName
-            const docsNeedingBp = aDocIds.filter(id => !docToBpNameMap[id] && !docToBpNameMap[id.replace(/^0+/, '')]);
+            // If any doc IDs are missing PayerName, look up Payer from S4_einvoice
+            const docsNeedingPayer = aDocIds.filter(id => !docToPayerNameMap[id] && !docToPayerNameMap[id.replace(/^0+/, '')]);
 
-            if (docsNeedingBp.length > 0) {
+            if (docsNeedingPayer.length > 0) {
                 const queryDocIds = [];
-                docsNeedingBp.forEach(id => {
+                docsNeedingPayer.forEach(id => {
                     queryDocIds.push(id);
                     if (/^\d+$/.test(id) && id.length < 10) {
                         queryDocIds.push(id.padStart(10, '0'));
                     }
                 });
 
-                const docToCustomerMap = {};
-
-                // 1. Try querying S4_BD (A_BillingDocument) for SoldToParty / PayerParty
                 try {
-                    const bdDocs = await S4_BD.run(
-                        SELECT.from('A_BillingDocument')
-                            .columns('BillingDocument', 'SoldToParty', 'PayerParty')
+                    const einvDocs = await S4_einvoice.run(
+                        SELECT.from('YY1_BillingDocumentAPI')
+                            .columns('BillingDocument', 'Payer')
                             .where({ BillingDocument: { in: queryDocIds } })
                     );
-                    if (Array.isArray(bdDocs)) {
-                        bdDocs.forEach(d => {
-                            const customer = d.SoldToParty || d.PayerParty;
-                            if (customer) {
+                    if (Array.isArray(einvDocs)) {
+                        einvDocs.forEach(d => {
+                            const rawPayer = (d.Payer || '').trim();
+                            const cleanPayer = rawPayer.replace(/\s*\(\d+\)\s*$/, '').trim() || rawPayer;
+                            if (cleanPayer) {
                                 const unpaddedDoc = d.BillingDocument.replace(/^0+/, '');
-                                docToCustomerMap[d.BillingDocument] = customer;
-                                docToCustomerMap[unpaddedDoc] = customer;
+                                docToPayerNameMap[d.BillingDocument] = cleanPayer;
+                                docToPayerNameMap[unpaddedDoc] = cleanPayer;
                             }
                         });
                     }
                 } catch (err) {
-                    console.warn("Could not fetch customer from S4_BD:", err.message);
-                }
-
-                // 2. If any docs still missing customer, try S4_einvoice (YY1_BillingDocumentAPI)
-                const docsStillMissing = queryDocIds.filter(id => !docToCustomerMap[id]);
-                if (docsStillMissing.length > 0) {
-                    try {
-                        const einvDocs = await S4_einvoice.run(
-                            SELECT.from('YY1_BillingDocumentAPI')
-                                .columns('BillingDocument', 'SoldToParty', 'PayerParty', 'CustomerFullName')
-                                .where({ BillingDocument: { in: docsStillMissing } })
-                        );
-                        if (Array.isArray(einvDocs)) {
-                            einvDocs.forEach(d => {
-                                const customer = d.SoldToParty || d.PayerParty;
-                                const unpaddedDoc = d.BillingDocument.replace(/^0+/, '');
-                                if (customer) {
-                                    docToCustomerMap[d.BillingDocument] = customer;
-                                    docToCustomerMap[unpaddedDoc] = customer;
-                                }
-                                if (d.CustomerFullName && !docToBpNameMap[d.BillingDocument]) {
-                                    docToBpNameMap[d.BillingDocument] = d.CustomerFullName;
-                                    docToBpNameMap[unpaddedDoc] = d.CustomerFullName;
-                                }
-                            });
-                        }
-                    } catch (err) {
-                        console.warn("Could not fetch customer from S4_einvoice:", err.message);
-                    }
-                }
-
-                // 3. For all identified customers, query S4_CUST (BusinesPartner)
-                const customerList = [...new Set(Object.values(docToCustomerMap).filter(Boolean))];
-                if (customerList.length > 0) {
-                    try {
-                        const queryParties = [];
-                        customerList.forEach(p => {
-                            queryParties.push(p);
-                            if (/^\d+$/.test(p) && p.length < 10) {
-                                queryParties.push(p.padStart(10, '0'));
-                            }
-                        });
-
-                        const customerToBpName = {};
-                        const bpData = await S4_CUST.run(
-                            SELECT.from(BusinesPartner)
-                                .where({ Customer: { in: queryParties } })
-                        );
-
-                        if (Array.isArray(bpData)) {
-                            bpData.forEach(bp => {
-                                const name = (bp.BusinessPartnerName || bp.BusinessPartnerFullName || '').trim();
-                                if (name) {
-                                    if (bp.Customer) {
-                                        const unpadded = bp.Customer.replace(/^0+/, '');
-                                        customerToBpName[bp.Customer] = name;
-                                        customerToBpName[unpadded] = name;
-                                    }
-                                    if (bp.BusinessPartner) {
-                                        const unpaddedBP = bp.BusinessPartner.replace(/^0+/, '');
-                                        customerToBpName[bp.BusinessPartner] = name;
-                                        customerToBpName[unpaddedBP] = name;
-                                    }
-                                }
-                            });
-                        }
-
-                        // Also check if any queryParties were not matched by Customer, try matching by BusinessPartner
-                        const unfoundParties = queryParties.filter(p => !customerToBpName[p] && !customerToBpName[p.replace(/^0+/, '')]);
-                        if (unfoundParties.length > 0) {
-                            try {
-                                const bpData2 = await S4_CUST.run(
-                                    SELECT.from(BusinesPartner)
-                                        .where({ BusinessPartner: { in: unfoundParties } })
-                                );
-                                if (Array.isArray(bpData2)) {
-                                    bpData2.forEach(bp => {
-                                        const name = (bp.BusinessPartnerName || bp.BusinessPartnerFullName || '').trim();
-                                        if (name) {
-                                            if (bp.Customer) {
-                                                const unpadded = bp.Customer.replace(/^0+/, '');
-                                                customerToBpName[bp.Customer] = name;
-                                                customerToBpName[unpadded] = name;
-                                            }
-                                            if (bp.BusinessPartner) {
-                                                const unpaddedBP = bp.BusinessPartner.replace(/^0+/, '');
-                                                customerToBpName[bp.BusinessPartner] = name;
-                                                customerToBpName[unpaddedBP] = name;
-                                            }
-                                        }
-                                    });
-                                }
-                            } catch (err2) {
-                                console.warn("Could not fetch Business Partner by BP number:", err2.message);
-                            }
-                        }
-
-                        // Map found BP names to billing documents
-                        for (const docId of aDocIds) {
-                            const unpaddedDoc = docId.replace(/^0+/, '');
-                            const cust = docToCustomerMap[docId] || docToCustomerMap[unpaddedDoc] || docToCustomerMap[docId.padStart(10, '0')];
-                            if (cust) {
-                                const unpaddedCust = cust.replace(/^0+/, '');
-                                const name = customerToBpName[cust] || customerToBpName[unpaddedCust] || customerToBpName[cust.padStart(10, '0')];
-                                if (name) {
-                                    docToBpNameMap[docId] = name;
-                                    docToBpNameMap[unpaddedDoc] = name;
-                                }
-                            }
-                        }
-                    } catch (err) {
-                        console.error("Error fetching Business Partner details from S4_CUST:", err.message);
-                    }
+                    console.warn("Could not fetch Payer from S4_einvoice:", err.message);
                 }
             }
 
@@ -437,14 +325,14 @@ module.exports = cds.service.impl(async function () {
                         const fileBytes = Buffer.from(cleanPdfBinary, 'base64');
 
                         const unpaddedId = BillDocId.replace(/^0+/, '');
-                        const bpRawName = docToBpNameMap[BillDocId] || docToBpNameMap[unpaddedId] || docToBpNameMap[BillDocId.padStart(10, '0')] || '';
-                        const cleanBpName = bpRawName
+                        const payerRawName = docToPayerNameMap[BillDocId] || docToPayerNameMap[unpaddedId] || docToPayerNameMap[BillDocId.padStart(10, '0')] || '';
+                        const cleanPayerName = payerRawName
                             .replace(/[/\\?%*:|"<>]/g, '')
                             .replace(/[\r\n\t]/g, ' ')
                             .replace(/\s+/g, ' ')
                             .trim();
 
-                        const pdfFileName = cleanBpName ? `${BillDocId}(${cleanBpName}).pdf` : `${BillDocId}.pdf`;
+                        const pdfFileName = cleanPayerName ? `${BillDocId}(${cleanPayerName}).pdf` : `${BillDocId}.pdf`;
 
                         zipFiles.push({
                             name: pdfFileName,

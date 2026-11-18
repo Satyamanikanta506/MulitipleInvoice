@@ -38,6 +38,7 @@ service konnekt {
     entity BusinesPartner as projection on S4_CUST.A_BusinessPartner{
         key BusinessPartner,
         Customer,
+        BusinessPartnerName,
         BusinessPartnerFullName
 
     }
@@ -56,6 +57,10 @@ service konnekt {
         BillingDocumentType,
         @title : 'Billing Date'
         BillingDocumentDate,
+        @title : 'Sold-to Party'
+        SoldToParty,
+        @title : 'Customer Name'
+        CustomerFullName,
         Payer,
         @title : 'Net Value'
         TotalNetAmount,

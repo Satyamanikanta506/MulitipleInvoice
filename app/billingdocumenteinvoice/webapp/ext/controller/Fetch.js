@@ -24,10 +24,19 @@ sap.ui.define([
                 return;
             }
 
-            var aBillingDocuments = aSelectedContexts.map(function (oContext) {
-                return oContext.getObject().BillingDocument;
+            var aBillingDocData = aSelectedContexts.map(function (oContext) {
+                var oObj = oContext.getObject();
+                var sBP = oObj.BusinessPartnerName || oObj.CustomerFullName || oObj.SoldToPartyText || "";
+                return {
+                    BillingDocument: oObj.BillingDocument,
+                    BusinessPartnerName: sBP
+                };
             });
-            var sBillingDocuments = aBillingDocuments.join(",");
+
+            var bHasBPName = aBillingDocData.some(function (item) { return !!item.BusinessPartnerName; });
+            var sBillingDocuments = bHasBPName
+                ? JSON.stringify(aBillingDocData)
+                : aBillingDocData.map(function (item) { return item.BillingDocument; }).join(",");
 
             var that = this;
             var mParameters = {
@@ -73,8 +82,14 @@ sap.ui.define([
                 
                 // Determine filename
                 var sFileName = "Invoices";
-                if (aBillingDocuments.length === 1) {
-                    sFileName = "Invoice_" + aBillingDocuments[0];
+                if (aBillingDocData.length === 1) {
+                    var oFirst = aBillingDocData[0];
+                    if (oFirst.BusinessPartnerName) {
+                        var sCleanBP = oFirst.BusinessPartnerName.replace(/[/\\?%*:|"<>]/g, '').trim();
+                        sFileName = "Invoice_" + oFirst.BillingDocument + (sCleanBP ? "(" + sCleanBP + ")" : "");
+                    } else {
+                        sFileName = "Invoice_" + oFirst.BillingDocument;
+                    }
                 } else {
                     sFileName = "Invoices_" + new Date().toISOString().slice(0, 10);
                 }
